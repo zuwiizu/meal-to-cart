@@ -49,6 +49,9 @@ To go live you need the Walmart MCP server and one browser download:
 | `match.py` | Scores search candidates, and refuses to guess below 0.70 confidence. Pure functions. |
 | `cart.py` | `build_plan` only searches. `apply` is the only writer, and it writes only what a human approved. |
 | `walmart.py` | The single MCP boundary. Owns the session and every response-shape assumption. |
+| `pantry.py` | Asks which staples you already own, and remembers, so it asks once and not weekly. |
+| `store.py` | SQLite. Pantry answers, saved recipe links, and every run's outcome. |
+| `counsel.py` | Optional local advisors (Laya for verdicts, Jev for ranking). No-ops when unconfigured. |
 | `guard.py` | Fails the build if a private term reaches a published file. |
 
 Two boundaries are deliberately narrow. `walmart.py` is the only module that touches the
@@ -106,6 +109,71 @@ Full evidence, including the commands and their output, is in `BUILD_LOG.public.
 
 ---
 
+## The cupboard problem
+
+The planner already prints a cupboard check, then ignores it: the shopping list still
+contains all fifteen seasonings. So they get bought every week, or deleted by hand every
+week.
+
+`meal-to-cart --pantry` asks about only the staples *this week's plan actually needs* —
+eight questions for the sample week, not a hundred and twenty — and stores the answers.
+
+```
+$ meal-to-cart --pantry
+8 item(s) this week's plan needs could already be in your kitchen.
+Answer once and it stops asking. Enter = you need to buy it.
+
+  [Keeps well in the cupboard] already have garlic? [y/N] y
+  [Keeps well in the cupboard] already have onion? [y/N] y
+  [Dry goods] already have tomato sauce? [y/N]
+  ...
+
+pantry: 8 answer(s) saved to state.db. 8 total.
+
+$ meal-to-cart --pantry
+pantry: nothing new to ask about (8 answers already stored)
+```
+
+The second run is silent, and afterwards the shopping list simply omits them. Answering
+"yes" to `onion` removes every line that means onion, because `small onion`,
+`to 1/2 cup onions` and `onions` are one bulb in one drawer — that is what
+`canonical()` in `normalize.py` exists for.
+
+State lives in one gitignored SQLite file: pantry answers, saved recipe links, and what
+each week's run proposed and what you approved.
+
+## Laya and Jev
+
+Both are optional local advisors, reached over the same MCP transport `walmart.py`
+already uses. `counsel.py` has a null implementation, so with nothing configured the app
+runs on its built-in scorer and every call site stays free of "is it configured" branches.
+
+They do **not** speed up the cart path. That path is limited by Walmart's request rate,
+not by thinking, so no amount of local inference changes it. What they remove is the API
+key, and that is the thing that actually blocks an average user.
+
+They are worth wiring for quality. Measured on this project's worst case:
+
+```
+jev_rank("fresh dill herb, a bunch, for garnish")
+  Fresh Dill, 0.75 oz Clamshell                     3.74
+  Dill Pickle Flavored Potato Chips                 0.70
+  OH SNAP! Dilly Bites Dill Pickle Snack Pack       0.69
+
+laya_decide("tool_risk", {action: "add_to_cart", credentials_involved: true})
+  verdict "ask_human" (p=0.841)
+```
+
+Token overlap gave the snack pack 1.00 — the highest score the system can give. Jev put
+it last, in 438ms, for $0.000025. And Laya independently arrives at "ask a human" for a
+live cart write, which is the stance the whole design is built around.
+
+Wire them with:
+
+```bash
+MEAL_TO_CART_COUNSEL_CMD="npx -y your-advisor-mcp" meal-to-cart --live
+```
+
 ## Safety
 
 - The agent **never calls checkout**. There is no code path that pays.
@@ -118,7 +186,7 @@ Full evidence, including the commands and their output, is in `BUILD_LOG.public.
 ## Layout
 
 ```
-src/meal_to_cart/   normalize, match, cart, cli, walmart, guard, server
+src/meal_to_cart/   normalize, match, cart, pantry, store, counsel, walmart, guard, server
 data/               extras.json, rules.public.json, sample/
 site/               the static demo page (demo mode always works; live mode via tunnel)
 scripts/            setup_mcp.sh, patch_mcp.py, probe_mcp.py

@@ -99,6 +99,33 @@ def normalize_query(name: str) -> str:
     return text.strip(" ,.-")
 
 
+# Words that are already singular, or that would be mangled by stripping an 's'.
+_NO_PLURAL_STRIP = ("ss", "us", "is", "ous")
+_IRREGULAR = {"tomatoes": "tomato", "potatoes": "potato", "leaves": "leaf",
+              "loaves": "loaf", "halves": "half"}
+
+
+def _singular(word: str) -> str:
+    if word in _IRREGULAR:
+        return _IRREGULAR[word]
+    if len(word) > 3 and word.endswith("ies"):
+        return word[:-3] + "y"
+    if len(word) > 3 and word.endswith("oes"):
+        return word[:-2]
+    if len(word) > 3 and word.endswith("s") and not word.endswith(_NO_PLURAL_STRIP):
+        return word[:-1]
+    return word
+
+
+def canonical(name: str) -> str:
+    """The key for "is this the same thing I already own?".
+
+    'small onion', 'to 1/2 cup onions' and 'onions' are one bulb in one drawer,
+    and marking it owned has to silence all three.
+    """
+    return " ".join(_singular(w) for w in normalize_query(name).split())
+
+
 def is_filler(name: str) -> bool:
     return normalize_query(name) in FILLER
 

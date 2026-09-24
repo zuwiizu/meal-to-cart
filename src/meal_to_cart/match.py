@@ -22,6 +22,19 @@ _STOP = {"the", "and", "with", "of", "a", "an", "oz", "lb", "lbs", "pack",
 
 _BULK_SIZE = re.compile(r"\b(16|24|32|48|64|80|128)\s*(?:oz|fl oz|ct|count)\b", re.I)
 
+# A one-word query matches any title containing that word. In a real run, "dill"
+# scored 1.00 against "OH SNAP! Dilly Bites Dill Pickle Snack Pack, Fat Free" --
+# a perfect score for a bag of candy when the plan wanted a bunch of herbs.
+# When the query does not itself name a product form, a title that does is a
+# different kind of thing, however many tokens it shares.
+FORM_WORDS = {
+    "snack", "snacks", "chips", "candy", "soda", "juice", "sauce", "dressing",
+    "pickle", "pickles", "pickled", "flavored", "flavour", "mix", "seasoning",
+    "powder", "cereal", "bar", "bars", "cookie", "cookies", "cracker", "crackers",
+    "frozen", "instant", "dip", "spread", "syrup", "jam", "jelly", "canned",
+}
+FORM_MISMATCH_PENALTY = 0.45
+
 
 def _tokens(text: str) -> set[str]:
     return {w for w in re.findall(r"[a-z0-9]+", text.lower()) if w not in _STOP}
@@ -31,11 +44,15 @@ def confidence(query: str, title: str, buy: Buy) -> float:
     wanted = _tokens(query)
     if not wanted:
         return 0.0
-    overlap = len(wanted & _tokens(title)) / len(wanted)
+    title_tokens = _tokens(title)
+    overlap = len(wanted & title_tokens) / len(wanted)
     penalty = 0.0
     # A recipe asking for half a cup should not get a 64oz club pack.
     if pack_hint(buy.buy) == "small" and _BULK_SIZE.search(title):
         penalty += 0.15
+    # The query did not ask for a processed form, but the product is one.
+    if not (wanted & FORM_WORDS) and (title_tokens & FORM_WORDS):
+        penalty += FORM_MISMATCH_PENALTY
     return max(0.0, min(1.0, overlap - penalty))
 
 

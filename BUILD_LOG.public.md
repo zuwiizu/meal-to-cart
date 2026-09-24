@@ -334,6 +334,41 @@ that a browser works, assert the thing that must never happen. `test_probe.py` n
 every source line and fails if the word `checkout` appears anywhere outside the constant
 that declares it forbidden. There is no code path that pays, and the build proves it.
 
+### 3.14 A perfect score for the wrong product
+
+The matcher scores a candidate by how much of the query appears in the product title.
+Here is what a real run did with the line `dill sprigs`:
+
+```
+[add] dill -> OH SNAP! Dilly Bites Dill Pickle Snack Pack, Fat Free
+```
+
+Confidence **1.00**. The highest score the system can give, for a bag of candy, against a
+recipe asking for a bunch of fresh herbs.
+
+The arithmetic is not wrong. The query normalises to `dill`, which is one token, and the
+title contains that token, so overlap is 1/1. A single-token query cannot express what
+*kind* of thing it wants, and token overlap has no way to notice.
+
+The fix is a form check: when the query does not itself name a processed form but the
+title does, that is a different kind of product regardless of how many tokens it shares.
+`snack`, `pickle`, `chips`, `sauce`, `frozen`, `candy` and about twenty others carry a
+penalty that puts the score under the auto-add bar:
+
+```
+dill  x OH SNAP! Dilly Bites Dill Pickle Snack Pack  ->  0.55  flag
+pickles x Great Value Whole Dill Pickles             ->  1.00  add
+```
+
+The second line is the check on the check: `pickles` is on the shopping list and must
+still match pickles, so the penalty only applies when the query does **not** name the form.
+Both cases are tests.
+
+This is the failure worth showing in the video, more than the User-Agent one. The
+User-Agent problem announced itself as an error. This one announced itself as success, and
+it was only caught by reading the actual matched titles in a real run rather than trusting
+the confidence number.
+
 ## 4. What the run does now
 
 ```

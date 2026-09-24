@@ -11,7 +11,7 @@ from datetime import date
 from pathlib import Path
 
 from .models import Buy
-from .normalize import is_filler, normalize_query
+from .normalize import canonical, is_filler, normalize_query
 
 # The pipeline already knows its own staples, and its own spices aisle is the
 # "check the cupboard first" list it prints above the shopping list.
@@ -65,7 +65,7 @@ def dedupe(buys: list[Buy]) -> list[Buy]:
     """
     merged: dict[str, Buy] = {}
     for buy in buys:
-        key = normalize_query(buy.item)
+        key = canonical(buy.item)
         if not key:
             continue
         if key in merged:

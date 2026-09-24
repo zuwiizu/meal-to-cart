@@ -17,15 +17,49 @@ from .cart import apply, build_plan, render
 from .load import load_extras, load_shopping
 from .match import score
 from .models import MatchResult
-from .normalize import normalize_query
+from .normalize import canonical, normalize_query
+from .pantry import candidates, filter_buys, group_for, load_catalog
+from .store import Store
 from .walmart import WalmartMCP, load_cache, reset_session
 
 RUNS = Path(__file__).resolve().parents[2] / "site" / "data"
 
 
-def collect(shopping: str, extras: str, limit: int | None) -> list:
+def collect(shopping: str, extras: str, limit: int | None,
+            store: Store | None = None) -> list:
     buys = load_shopping(shopping) + load_extras(extras, on=date.today())
+    if store is not None:
+        buys, on_hand = filter_buys(buys, store)
+        if on_hand:
+            print(f"pantry: {len(on_hand)} line(s) already on hand, skipped")
     return buys[:limit] if limit else buys
+
+
+def run_pantry(shopping: str, extras: str, store: Store) -> int:
+    """Ask once per staple, remember the answer, never ask again."""
+    buys = load_shopping(shopping) + load_extras(extras, on=date.today())
+    catalog = load_catalog()
+    todo = candidates(buys, catalog, store.pantry())
+    if not todo:
+        print("pantry: nothing new to ask about "
+              f"({len(store.pantry())} answers already stored)")
+        return 0
+    print(f"{len(todo)} item(s) this week's plan needs could already be in your "
+          f"kitchen.\nAnswer once and it stops asking. Enter = you need to buy it.\n")
+    answered = 0
+    for buy in todo:
+        key = canonical(buy.item)
+        group = group_for(buy.item, catalog)
+        try:
+            answer = input(f"  [{group}] already have {key}? [y/N] ")
+        except EOFError:
+            print("\n  (no input available; stopping, nothing else was saved)")
+            break
+        store.set_pantry(key, "have" if answer.strip().lower() in ("y", "yes") else "need")
+        answered += 1
+    print(f"\npantry: {answered} answer(s) saved to {store.path.name}. "
+          f"{len(store.pantry())} total.")
+    return 0
 
 
 def dump(results: list[MatchResult], summary: dict, path: Path) -> None:
@@ -56,7 +90,17 @@ def dump(results: list[MatchResult], summary: dict, path: Path) -> None:
 
 
 async def run(args) -> int:
-    buys = collect(args.shopping, args.extras, args.limit)
+    with Store(args.db) as store:
+        if args.forget_pantry:
+            store.forget_pantry(args.forget_pantry)
+            print(f"pantry: forgot {args.forget_pantry}")
+        if args.pantry:
+            return run_pantry(args.shopping, args.extras, store)
+        return await _run(args, store)
+
+
+async def _run(args, store: Store) -> int:
+    buys = collect(args.shopping, args.extras, args.limit, store)
     print(f"{len(buys)} lines to consider "
           f"({sum(1 for b in buys if b.source == 'extras')} of them extras)")
 
@@ -130,6 +174,7 @@ async def run(args) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="meal-to-cart")
     root = Path(__file__).resolve().parents[2]
+    parser.add_argument("--db", default=None, help="where to keep pantry and run history")
     parser.add_argument("--shopping", default=str(root / "data/sample/shopping.sample.json"))
     parser.add_argument("--extras", default=str(root / "data/extras.json"))
     parser.add_argument("--limit", type=int, default=None)
@@ -138,6 +183,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--yes", action="store_true",
                         help="auto-approve matches (still never checks out)")
+    parser.add_argument("--pantry", action="store_true",
+                        help="ask which staples you already have, and remember")
+    parser.add_argument("--forget-pantry", metavar="ITEM",
+                        help="forget one pantry answer, so it asks again")
     parser.add_argument("--replay", action="store_true",
                         help="rebuild the full plan from cached searches, offline")
     parser.add_argument("--no-cache", action="store_true",

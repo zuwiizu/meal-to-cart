@@ -5,5 +5,7 @@ __pycache__/
 .cache/
 node_modules/
 site/data/live-run.json
+data/state.db
+data/private-terms.txt
 probe-output.json
 probe-error.log

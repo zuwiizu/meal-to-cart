@@ -75,6 +75,24 @@ def test_a_match_without_an_item_id_can_never_be_added():
     assert result.item_id is None
 
 
+def test_a_snack_pack_is_not_a_bunch_of_herbs():
+    """The exact false positive from a real run, at full token overlap."""
+    cands = [{"item_id": "521946957",
+              "title": "OH SNAP! Dilly Bites Dill Pickle Snack Pack, Fat Free",
+              "price_text": "$2.48", "price": 2.48}]
+    result = score(Buy(item="dill sprigs", buy="1 bunch", aisle="produce"),
+                   "dill", cands)
+    assert result.confidence < 0.70
+    assert result.action == "flag"
+
+
+def test_the_penalty_does_not_fire_when_the_query_asks_for_that_form():
+    """'pickles' is on the shopping list, and it should match pickles."""
+    cands = [{"item_id": "1", "title": "Great Value Whole Dill Pickles",
+              "price_text": "$2.12", "price": 2.12}]
+    assert score(Buy(item="pickles"), "pickles", cands).action == "add"
+
+
 def test_a_small_recipe_amount_is_penalised_for_a_club_pack():
     buy = Buy(item="buttermilk", buy="0.5 cup")
     small = confidence("buttermilk", "Buttermilk 1 qt", buy)
