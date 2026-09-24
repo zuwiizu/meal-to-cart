@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "meal-to-cart"
+version = "0.1.0"
+description = "Turn a weekly dinner plan into a reviewed Walmart cart, stopping before payment."
+requires-python = ">=3.11"
+dependencies = ["mcp>=1.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+meal-to-cart = "meal_to_cart.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

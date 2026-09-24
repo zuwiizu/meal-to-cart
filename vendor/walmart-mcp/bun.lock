@@ -1,0 +1,32 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "walmart-mcp-vendor",
+      "dependencies": {
+        "@striderlabs/mcp-walmart": "0.2.1",
+        "patchright": "1.63.0",
+      },
+    },
+  },
+  "packages": {
+    "@cfworker/json-schema": ["@cfworker/json-schema@4.1.1", "", {}, "sha512-gAmrUZSGtKc3AiBL71iNWxDsyUC5uMaKKGdvzYsBoTW/xi42JQHl7eKV2OYzCUqvc+D2RCcf7EXY2iCyFIk6og=="],
+
+    "@modelcontextprotocol/server": ["@modelcontextprotocol/server@2.0.0-alpha.2", "", { "dependencies": { "zod": "^4.0" }, "peerDependencies": { "@cfworker/json-schema": "^4.1.1" }, "optionalPeers": ["@cfworker/json-schema"] }, "sha512-gmLgdHzlYM8L7Aw/+VE0kxjT25WKamtUSLNhdOgrJq5CrESvqVSoAfWSJJeNPUXNTluQ+dYDGFbKVitdsJtbPA=="],
+
+    "@striderlabs/mcp-walmart": ["@striderlabs/mcp-walmart@0.2.1", "", { "dependencies": { "@cfworker/json-schema": "^4.1.1", "@modelcontextprotocol/server": "2.0.0-alpha.2", "patchright": "^1.58.2", "playwright-extra": "^4.3.6" }, "bin": { "mcp-walmart": "dist/index.js" } }, "sha512-ZsxVzy1fOy+tXYd9P1A1XFPoUiBK9Zt5egbfbhleHGWzW+HvH6YaLZ5u+oc0N7ZguT06oQY3LsGgqy439yOcOQ=="],
+
+    "debug": ["debug@4.4.3", "", { "dependencies": { "ms": "^2.1.3" }, "peerDependencies": { "supports-color": "*" }, "optionalPeers": ["supports-color"] }, "sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA=="],
+
+    "ms": ["ms@2.1.3", "", {}, "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA=="],
+
+    "patchright": ["patchright@1.63.0", "", { "dependencies": { "patchright-core": "1.63.0" }, "bin": { "patchright": "cli.js" } }, "sha512-WVXhmNhAJ5I+CmcHEu/I3KMKhOlQaKS1XJsk+5nRIypKJ3Dq9IaQP29p4vB3I1FWCTarUXVRj02Na30wGcuztQ=="],
+
+    "patchright-core": ["patchright-core@1.63.0", "", { "bin": { "patchright-core": "cli.js" } }, "sha512-nuRJVTMVKoOFzY8vmwFqJZR3F0trUCKiPzDSgCOPq/yHHTefm9czILV23dXJsi5mvS7sCy7U1CqG7edA/21DtQ=="],
+
+    "playwright-extra": ["playwright-extra@4.3.6", "", { "dependencies": { "debug": "^4.3.4" }, "peerDependencies": { "playwright": "*", "playwright-core": "*" }, "optionalPeers": ["playwright", "playwright-core"] }, "sha512-q2rVtcE8V8K3vPVF1zny4pvwZveHLH8KBuVU2MoE3Jw4OKVoBWsHI9CH9zPydovHHOCDxjGN2Vg+2m644q3ijA=="],
+
+    "zod": ["zod@4.6.5", "", {}, "sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q=="],
+  }
+}

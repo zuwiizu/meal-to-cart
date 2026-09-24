@@ -1,0 +1,783 @@
+{
+  "week": "2026-09-24",
+  "items": [
+    {
+      "item": "cucumbers",
+      "buy": "as needed",
+      "aisle": "produce",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "dill sprigs",
+      "buy": "1 bunch",
+      "aisle": "produce",
+      "meals": [
+        "Thursday"
+      ],
+      "need": "a garnish",
+      "approximate": true,
+      "spare": ""
+    },
+    {
+      "item": "english cucumber",
+      "buy": "1",
+      "aisle": "produce",
+      "meals": [
+        "Sunday"
+      ],
+      "need": "1",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "fingerling potatoes",
+      "buy": "10 oz",
+      "aisle": "produce",
+      "meals": [
+        "Thursday"
+      ],
+      "need": "10 oz",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "garlic cloves",
+      "buy": "1 head of garlic",
+      "aisle": "produce",
+      "meals": [
+        "Saturday",
+        "Wednesday"
+      ],
+      "need": "approx. 6 cloves",
+      "approximate": true,
+      "spare": ""
+    },
+    {
+      "item": "grape tomatoes",
+      "buy": "4 oz",
+      "aisle": "produce",
+      "meals": [
+        "Thursday"
+      ],
+      "need": "4 oz",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "green bell pepper",
+      "buy": "0.5",
+      "aisle": "produce",
+      "meals": [
+        "Sunday"
+      ],
+      "need": "0.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "juice of 2 large limes )",
+      "buy": "as needed",
+      "aisle": "produce",
+      "meals": [
+        "Sunday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "large zucchini",
+      "buy": "6",
+      "aisle": "produce",
+      "meals": [
+        "Tuesday"
+      ],
+      "need": "6",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "lemon",
+      "buy": "3 lemons",
+      "aisle": "produce",
+      "meals": [
+        "Saturday",
+        "Wednesday",
+        "Thursday"
+      ],
+      "need": "approx. 2.28 lemons",
+      "approximate": true,
+      "spare": "a whole one is bought for only a little juice \u2014 zest it before juicing so none is wasted"
+    },
+    {
+      "item": "medium garlic cloves",
+      "buy": "4",
+      "aisle": "produce",
+      "meals": [
+        "Tuesday"
+      ],
+      "need": "4",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "parsley",
+      "buy": "1 bunch",
+      "aisle": "produce",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "a garnish",
+      "approximate": true,
+      "spare": ""
+    },
+    {
+      "item": "roma tomatoes",
+      "buy": "3",
+      "aisle": "produce",
+      "meals": [
+        "Sunday"
+      ],
+      "need": "3",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "shredded lettuce",
+      "buy": "as needed",
+      "aisle": "produce",
+      "meals": [
+        "Monday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "small onion",
+      "buy": "2",
+      "aisle": "produce",
+      "meals": [
+        "Saturday",
+        "Tuesday"
+      ],
+      "need": "2",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "tablespoon fresh chives",
+      "buy": "1 bunch",
+      "aisle": "produce",
+      "meals": [
+        "Friday"
+      ],
+      "need": "a garnish",
+      "approximate": true,
+      "spare": ""
+    },
+    {
+      "item": "tbsp dried mint",
+      "buy": "1 bunch",
+      "aisle": "produce",
+      "meals": [
+        "Sunday"
+      ],
+      "need": "a garnish",
+      "approximate": true,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon dried basil",
+      "buy": "1 bunch",
+      "aisle": "produce",
+      "meals": [
+        "Friday"
+      ],
+      "need": "a garnish",
+      "approximate": true,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon dried parsley",
+      "buy": "1 bunch",
+      "aisle": "produce",
+      "meals": [
+        "Friday"
+      ],
+      "need": "a garnish",
+      "approximate": true,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon lemon",
+      "buy": "1",
+      "aisle": "produce",
+      "meals": [
+        "Monday"
+      ],
+      "need": "1",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "to 1/2 cup onions",
+      "buy": "0.25",
+      "aisle": "produce",
+      "meals": [
+        "Sunday"
+      ],
+      "need": "0.25",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "to 3 tbsp each fresh parsley",
+      "buy": "1 bunch",
+      "aisle": "produce",
+      "meals": [
+        "Sunday"
+      ],
+      "need": "a garnish",
+      "approximate": true,
+      "spare": ""
+    },
+    {
+      "item": "tomatoes",
+      "buy": "as needed",
+      "aisle": "produce",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "yellow onion",
+      "buy": "1",
+      "aisle": "produce",
+      "meals": [
+        "Wednesday"
+      ],
+      "need": "1",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "lbs flank or skirt steak",
+      "buy": "1.5",
+      "aisle": "meat",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "1.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "pound boneless lamb loin or boneless leg of lamb",
+      "buy": "1.5",
+      "aisle": "meat",
+      "meals": [
+        "Wednesday"
+      ],
+      "need": "1.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "pound chicken breast cut in half",
+      "buy": "1 + 2 cups",
+      "aisle": "meat",
+      "meals": [
+        "Monday",
+        "Friday"
+      ],
+      "need": "1 + 2 cups",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "pound lean ground beef",
+      "buy": "1",
+      "aisle": "meat",
+      "meals": [
+        "Tuesday"
+      ],
+      "need": "1",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon clove, ground",
+      "buy": "0.5",
+      "aisle": "meat",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "0.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "salmon fillets",
+      "buy": "12 oz",
+      "aisle": "seafood",
+      "meals": [
+        "Thursday"
+      ],
+      "need": "12 oz",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "1% buttermilk",
+      "buy": "0.5 cup",
+      "aisle": "dairy",
+      "meals": [
+        "Friday"
+      ],
+      "need": "0.5 cup",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "buttermilk",
+      "buy": "0.33 cup",
+      "aisle": "dairy",
+      "meals": [
+        "Monday"
+      ],
+      "need": "0.33 cup",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "lemon garlic butter",
+      "buy": "0.8 oz",
+      "aisle": "dairy",
+      "meals": [
+        "Thursday"
+      ],
+      "need": "0.8 oz",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "shredded colby jack cheese",
+      "buy": "as needed",
+      "aisle": "dairy",
+      "meals": [
+        "Monday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "shredded mozzarella cheese",
+      "buy": "2 cups",
+      "aisle": "dairy",
+      "meals": [
+        "Tuesday"
+      ],
+      "need": "2 cups",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "pita breads for wraps",
+      "buy": "as needed",
+      "aisle": "bakery",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "(15oz tomato sauce)",
+      "buy": "1 can",
+      "aisle": "pantry",
+      "meals": [
+        "Tuesday"
+      ],
+      "need": "1 can",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "flour tortillas",
+      "buy": "as needed",
+      "aisle": "pantry",
+      "meals": [
+        "Monday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "garlic aioli",
+      "buy": "2 fl oz",
+      "aisle": "pantry",
+      "meals": [
+        "Thursday"
+      ],
+      "need": "2 fl oz",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "garlic salt",
+      "buy": "0.5 tsp",
+      "aisle": "pantry",
+      "meals": [
+        "Thursday"
+      ],
+      "need": "0.5 tsp",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "mayonnaise",
+      "buy": "1 cup",
+      "aisle": "pantry",
+      "meals": [
+        "Monday"
+      ],
+      "need": "1 cup",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "salt",
+      "buy": "as needed",
+      "aisle": "pantry",
+      "meals": [
+        "Tuesday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "salt and pepper",
+      "buy": "as needed",
+      "aisle": "pantry",
+      "meals": [
+        "Sunday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "tablespoon yellow mustard",
+      "buy": "1",
+      "aisle": "pantry",
+      "meals": [
+        "Monday"
+      ],
+      "need": "1",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "tablespoons mayonnaise",
+      "buy": "3",
+      "aisle": "pantry",
+      "meals": [
+        "Friday"
+      ],
+      "need": "3",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "tablespoons olive oil",
+      "buy": "10",
+      "aisle": "pantry",
+      "meals": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Saturday"
+      ],
+      "need": "10",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "tablespoons worcestershire sauce",
+      "buy": "2",
+      "aisle": "pantry",
+      "meals": [
+        "Tuesday"
+      ],
+      "need": "2",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "tahini sauce",
+      "buy": "as needed",
+      "aisle": "pantry",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "tbsp extra virgin olive oil",
+      "buy": "3",
+      "aisle": "pantry",
+      "meals": [
+        "Sunday"
+      ],
+      "need": "3",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon allspice",
+      "buy": "0.5",
+      "aisle": "pantry",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "0.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon kosher salt",
+      "buy": "0.5",
+      "aisle": "pantry",
+      "meals": [
+        "Friday"
+      ],
+      "need": "0.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon salt",
+      "buy": "2.5",
+      "aisle": "pantry",
+      "meals": [
+        "Monday",
+        "Wednesday",
+        "Saturday"
+      ],
+      "need": "2.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "to 1/2 teaspoon salt",
+      "buy": "0.25",
+      "aisle": "pantry",
+      "meals": [
+        "Monday"
+      ],
+      "need": "0.25",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "fresh black pepper",
+      "buy": "as needed",
+      "aisle": "spices",
+      "meals": [
+        "Friday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "garlic pepper",
+      "buy": "0.5 tsp",
+      "aisle": "spices",
+      "meals": [
+        "Thursday"
+      ],
+      "need": "0.5 tsp",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "italian seasoning blend",
+      "buy": "1 tsp",
+      "aisle": "spices",
+      "meals": [
+        "Thursday"
+      ],
+      "need": "1 tsp",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "tablespoon oregano",
+      "buy": "1.5",
+      "aisle": "spices",
+      "meals": [
+        "Tuesday"
+      ],
+      "need": "1.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon black pepper",
+      "buy": "2.5",
+      "aisle": "spices",
+      "meals": [
+        "Monday",
+        "Tuesday",
+        "Wednesday"
+      ],
+      "need": "2.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon cardamom, ground",
+      "buy": "0.5",
+      "aisle": "spices",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "0.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon cayenne pepper",
+      "buy": "0.25",
+      "aisle": "spices",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "0.25",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon cinnamon",
+      "buy": "0.5",
+      "aisle": "spices",
+      "meals": [
+        "Wednesday"
+      ],
+      "need": "0.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon cinnamon, ground",
+      "buy": "0.5",
+      "aisle": "spices",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "0.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon cumin",
+      "buy": "2.5",
+      "aisle": "spices",
+      "meals": [
+        "Monday",
+        "Wednesday",
+        "Saturday"
+      ],
+      "need": "2.5",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon garlic powder",
+      "buy": "1.75",
+      "aisle": "spices",
+      "meals": [
+        "Monday",
+        "Friday"
+      ],
+      "need": "1.75",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon onion powder",
+      "buy": "0.25",
+      "aisle": "spices",
+      "meals": [
+        "Friday"
+      ],
+      "need": "0.25",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon oregano",
+      "buy": "1",
+      "aisle": "spices",
+      "meals": [
+        "Monday"
+      ],
+      "need": "1",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "teaspoon paprika",
+      "buy": "3",
+      "aisle": "spices",
+      "meals": [
+        "Monday",
+        "Wednesday",
+        "Saturday"
+      ],
+      "need": "3",
+      "approximate": false,
+      "spare": ""
+    },
+    {
+      "item": "pickles",
+      "buy": "as needed",
+      "aisle": "other",
+      "meals": [
+        "Saturday"
+      ],
+      "need": "",
+      "approximate": false,
+      "spare": ""
+    }
+  ],
+  "pantry": [
+    "black pepper",
+    "butter",
+    "cooking spray",
+    "olive oil",
+    "salt",
+    "unsalted butter"
+  ],
+  "dropped": [
+    "Fresh mint for serving",
+    "Cucumber Yogurt Sauce (for serving)",
+    "Sumac (to taste (optional))"
+  ]
+}

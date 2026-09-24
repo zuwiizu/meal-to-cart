@@ -1,0 +1,106 @@
+{
+  "summary": {
+    "would_add": 0,
+    "added": 2,
+    "denied": 0,
+    "skipped_flagged": 3
+  },
+  "results": [
+    {
+      "action": "add",
+      "confidence": 1.0,
+      "item_id": "44419690",
+      "title": "Fresh Mini Cucumbers, 16 oz",
+      "price": 2.0,
+      "price_text": "2",
+      "reason": "",
+      "query": "cucumbers",
+      "buy": {
+        "item": "cucumbers",
+        "buy": "as needed",
+        "aisle": "produce",
+        "meals": [
+          "Saturday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "search failed: WalmartBlocked",
+      "query": "dill",
+      "buy": {
+        "item": "dill sprigs",
+        "buy": "1 bunch",
+        "aisle": "produce",
+        "meals": [
+          "Thursday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "search failed: WalmartBlocked",
+      "query": "english cucumber",
+      "buy": {
+        "item": "english cucumber",
+        "buy": "1",
+        "aisle": "produce",
+        "meals": [
+          "Sunday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.5,
+      "item_id": "44391123",
+      "title": "Fresh Yellow Petite Potatoes, 1.5 lb Bag",
+      "price": 4.0,
+      "price_text": "4",
+      "reason": "only 0.50 confident",
+      "query": "fingerling potatoes",
+      "buy": {
+        "item": "fingerling potatoes",
+        "buy": "10 oz",
+        "aisle": "produce",
+        "meals": [
+          "Thursday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "add",
+      "confidence": 1.0,
+      "item_id": "44391100",
+      "title": "Garlic Bulb Fresh Whole, Each",
+      "price": 0.0,
+      "price_text": "0",
+      "reason": "",
+      "query": "garlic",
+      "buy": {
+        "item": "garlic cloves",
+        "buy": "1 head of garlic",
+        "aisle": "produce",
+        "meals": [
+          "Saturday",
+          "Wednesday"
+        ],
+        "source": "plan"
+      }
+    }
+  ]
+}

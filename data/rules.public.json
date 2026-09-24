@@ -1,0 +1,28 @@
+{
+  "_comment": "The household's food rules, with the personal medical framing removed. Ids are generic on purpose; the private copy lives outside this repo.",
+  "header": "HOUSEHOLD FOOD-SAFETY RULES:",
+  "summary": "No pork, no alcohol, no shellfish. Avoid high-mercury fish, anything raw or undercooked, unpasteurised dairy, pate or liver, and raw sprouts. One household member tracks net carbs, so the carb source is named for every dinner.",
+  "rules": [
+    {"id": "pork", "severity": "reject",
+     "tokens": ["pork", "bacon", "ham", "prosciutto", "pancetta", "salami", "chorizo", "lard", "guanciale"],
+     "exceptions": ["hamburger", "burger", "turkey bacon", "beef bacon"]},
+    {"id": "shellfish", "severity": "reject",
+     "tokens": ["shrimp", "prawn", "crab", "lobster", "clam", "mussel", "oyster", "scallop", "squid", "calamari"],
+     "exceptions": ["crabapple", "scallion", "scalloped"]},
+    {"id": "alcohol", "severity": "reject",
+     "tokens": ["wine", "vodka", "beer", "sake", "mirin", "bourbon", "rum", "tequila", "champagne", "prosecco", "brandy", "cider", "liqueur"],
+     "exceptions": ["ginger ale", "root beer", "apple cider vinegar", "apple cider", "cider vinegar"]},
+    {"id": "high-mercury-fish", "severity": "reject",
+     "tokens": ["swordfish", "shark", "king mackerel", "tilefish", "bigeye tuna", "ahi", "bluefin", "yellowfin", "marlin"],
+     "exceptions": ["canned light tuna", "skipjack", "tongol"]},
+    {"id": "raw-or-undercooked", "severity": "reject",
+     "tokens": ["tartare", "carpaccio", "ceviche", "crudo", "raw egg", "runny egg", "medium rare", "unpasteurised", "unpasteurized"],
+     "exceptions": []},
+    {"id": "soft-cheese-check", "severity": "review",
+     "tokens": ["brie", "camembert", "gorgonzola", "roquefort", "burrata", "queso fresco", "blue cheese"],
+     "exceptions": ["pasteurised", "pasteurized"]},
+    {"id": "raw-sprouts", "severity": "reject",
+     "tokens": ["alfalfa sprout", "bean sprout", "raw sprout"],
+     "exceptions": []}
+  ]
+}

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Meal-to-Cart — a weekly dinner plan becomes a reviewed grocery cart</title>
+<meta name="description" content="Turns a weekly dinner plan into a proposed Walmart cart, matched item by item, and stops for human approval before anything is paid for.">
+<style>
+  :root {
+    --ink: #0d1117; --body: #3d4450; --muted: #7a828e;
+    --line: #e6e8ec; --bg: #fbfbfc; --card: #ffffff;
+    --add: #0a7d43; --flag: #a8620a; --accent: #4f46e5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--body);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 56px 24px 96px; }
+  header h1 { font-size: 30px; letter-spacing: -.02em; color: var(--ink); margin: 0 0 8px; }
+  header p.lede { font-size: 16px; color: var(--muted); margin: 0; max-width: 62ch; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+    padding: 3px 9px; border-radius: 999px; background: #eef0ff; color: var(--accent);
+    margin-bottom: 18px; letter-spacing: .01em;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    margin-top: 28px; overflow: hidden;
+  }
+  .stats { display: flex; flex-wrap: wrap; gap: 0; border-bottom: 1px solid var(--line); }
+  .stat { flex: 1 1 150px; padding: 18px 20px; border-right: 1px solid var(--line); }
+  .stat:last-child { border-right: 0; }
+  .stat .n { font-size: 24px; font-weight: 650; color: var(--ink); letter-spacing: -.02em; }
+  .stat .k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 2px; }
+  .bar { display: flex; gap: 10px; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  input[type=text] {
+    font: inherit; padding: 9px 13px; border: 1px solid var(--line); border-radius: 9px;
+    flex: 1 1 240px; min-width: 0; color: var(--ink); background: #fff;
+  }
+  input[type=text]:focus { outline: 2px solid #c7c9ff; border-color: #b9bcff; }
+  button {
+    font: inherit; font-weight: 550; padding: 9px 15px; border-radius: 9px; cursor: pointer;
+    border: 1px solid var(--line); background: #fff; color: var(--ink); transition: .12s;
+  }
+  button:hover { border-color: #c9ccd4; }
+  button.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+  button.primary:hover { background: #22282f; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); font-weight: 600; padding: 11px 20px; border-bottom: 1px solid var(--line);
+    background: #fcfcfd;
+  }
+  td { padding: 11px 20px; border-bottom: 1px solid #f1f2f5; vertical-align: top; color: var(--ink); }
+  tr:last-child td { border-bottom: 0; }
+  td.item { font-weight: 500; }
+  td.prod { color: var(--body); }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 650; padding: 2px 8px; border-radius: 999px; letter-spacing: .02em; }
+  .pill.add { background: #e6f6ed; color: var(--add); }
+  .pill.flag { background: #fdf1e3; color: var(--flag); }
+  .src { font-size: 11px; color: var(--muted); margin-left: 7px; font-weight: 400; }
+  .note { padding: 14px 20px; color: var(--muted); font-size: 13.5px; border-top: 1px solid var(--line); background: #fcfcfd; }
+  .note strong { color: var(--ink); font-weight: 600; }
+  footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
+  footer code { background: #f0f1f4; padding: 1.5px 6px; border-radius: 5px; font-size: 12.5px; }
+  .empty { padding: 40px 20px; text-align: center; color: var(--muted); }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge" id="mode">Recorded run</div>
+    <h1>Meal-to-Cart</h1>
+    <p class="lede">
+      A weekly dinner plan already produces a shopping list. This turns that list into a
+      proposed Walmart cart — every line matched to a real product, priced, and shown to a
+      human before anything is added. It stops before payment.
+    </p>
+  </header>
+
+  <div class="card">
+    <div class="stats" id="stats"></div>
+    <div class="bar">
+      <input type="text" id="q" placeholder="Try any item — cotton candy grapes, cotija cheese, dill">
+      <button class="primary" id="match">Match it</button>
+      <button id="live">Use live agent</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:92px">Action</th>
+          <th>Plan line</th>
+          <th>Matched product</th>
+          <th style="width:78px; text-align:right">Conf.</th>
+          <th style="width:92px; text-align:right">Price</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="note" id="note"></div>
+  </div>
+
+  <footer>
+    Nine lines in ten start life as recipe prose — <code>juice of 2 large limes )</code> is not
+    a product. Normalising them is most of the work.
+    The agent never calls checkout; payment is a human act.
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

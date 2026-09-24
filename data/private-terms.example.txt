@@ -1,0 +1,8 @@
+# Copy to private-terms.txt and add the substrings that must never be published.
+# One lowercase substring per line. Lines starting with # are ignored.
+# private-terms.txt is gitignored; this example file is not, so it must stay empty
+# of real terms.
+#
+# Example of the format only:
+#   some-family-name
+#   some-medical-term

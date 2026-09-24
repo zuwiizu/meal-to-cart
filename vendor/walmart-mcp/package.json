@@ -1,0 +1,9 @@
+{
+  "name": "walmart-mcp-vendor",
+  "private": true,
+  "description": "Pinned copy of the third-party Walmart MCP server the agent drives.",
+  "dependencies": {
+    "@striderlabs/mcp-walmart": "0.2.1",
+    "patchright": "1.63.0"
+  }
+}
