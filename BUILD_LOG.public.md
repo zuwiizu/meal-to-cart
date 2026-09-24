@@ -122,7 +122,7 @@ With all four path overrides in place, `set_address` worked and `search` did not
 
 ```
 === set_address ===
-Address saved locally: 1600 Pennsylvania Ave NW, Washington, DC 20500
+Address saved locally: [redacted]
 === search ===
 Error: No products found or page failed to load
 ```
@@ -192,21 +192,70 @@ $ rm cookies.json && meal-to-cart --limit 4
 Those are PerimeterX fingerprint cookies. The server saves cookies **even when the page it
 got back was the bot wall**, so one detection event is reloaded by every subsequent run.
 
-### 3.9 The block is sticky per browser session, so retrying is not enough
+### 3.9 The fix that was wrong, and how it was caught
 
-A retry loop with backoff did not help, and the log says why — the *same* block uuid comes
-back on every attempt:
+The first reading of the evidence was that a block is sticky for the life of one browser
+session, because retrying produced the *same* block uuid twice for the same query:
 
 ```
 [meal-to-cart] Walmart bot wall at ...?q=dill&uuid=591de930-b846-11f1-801d-b1a7063e02dc
 [meal-to-cart] Walmart bot wall at ...?q=dill&uuid=591de930-b846-11f1-801d-b1a7063e02dc
 ```
 
-Identical uuid means the same browser session. Waiting cannot clear it and the cookie jar
-actively preserves it, so a retry has to mean **a new browser with a clean jar**. That is
-what `WalmartMCP.restart()` does, and what `build_plan` calls before asking again.
+So session rotation was implemented: tear the browser down, delete the cookie jar, start
+again. It is a reasonable inference and it is wrong. Rotating produced a new `uuid` but
+**the same visitor id**:
 
-### 3.10 Prose is not a product
+```
+?q=dill             &uuid=8bf88ea0...&vid=897fe459-b846-11f1-8c0d-dd15c96e717f
+?q=english+cucumber &uuid=a195b300...&vid=581c5209-b846-11f1-a9d5-8cc37d701ea6
+?q=english+cucumber &uuid=a399e770...&vid=581c5209-b846-11f1-a9d5-8cc37d701ea6
+?q=english+cucumber &uuid=c5be98a0...&vid=c4e63f7d-b846-11f1-97ab-be5305dc32f4
+```
+
+`uuid` changes every time and `vid` barely moves — and when it does move, the new value is
+persisted straight back into the cookie jar. A fresh browser with an empty jar still
+presents the same visitor, so rotation cannot clear the block: what Walmart fingerprints
+is not the session.
+
+Counting searches across four runs gives the actual rule:
+
+| Run | Searches before the wall |
+| --- | --- |
+| `--limit 4` | 2 |
+| `--limit 5 --pause 8` | 2 |
+| `--limit 16 --pause 5` | 2 |
+| `--limit 70 --pause 22` | 2 |
+
+**It is a request rate, not a session.** Two searches go through, then the wall, and a
+short wait resets it. No amount of browser surgery changes that.
+
+Which means the fix is not to retry at all — it is to not ask twice.
+
+### 3.10 Not asking twice
+
+If the block is a rate, the engineering answer is to spend fewer requests. Two changes:
+
+**Cache every search.** Each query is written to `.cache/search-cache.json` keyed by its
+normalised form, so a second run over the same plan costs nothing. A weekly task mostly
+searches the same forty products every time; only the recipe-driven lines change. The first
+run pays the rate limit, every run after it is free.
+
+**Pace the first run.** The default gap between searches is 25 seconds, with one long wait
+and one retry if a block arrives anyway. Forty-five lines is then about twenty minutes of
+unattended work, which is the right shape for a task that runs once a week.
+
+And a replay mode, so the whole plan can be rebuilt from cache with no network at all:
+
+```
+$ meal-to-cart --replay
+[replay] 38/103 lines matched from cache, no network used
+```
+
+This is also what makes the demo page honest: it renders the real recorded run, not a
+mock-up, and it still loads instantly.
+
+### 3.11 Prose is not a product
 
 The real list, unfiltered:
 
@@ -226,18 +275,100 @@ test case is one of these strings.
 The pipeline's own staple rule is also exact-string matching, so `teaspoon kosher salt`
 sits in the pantry aisle and survives it. Normalising first catches it.
 
+### 3.12 The gate that checked nothing
+
+The privacy rule needed to be enforced by the build, so `guard.py` scans the tree and
+exits non-zero on a violation. It reported clean.
+
+It was checking nothing. The file-skip list contained `dist`, because the publish tree
+lives in `dist/public` and recursion into an output directory is wasted work:
+
+```python
+SKIP_PARTS = {".git", "__pycache__", "node_modules", ".venv", "dist"}
+```
+
+So when the gate was pointed at the publish directory — the one thing it exists to check —
+it matched `dist` in every path and skipped every file. The tell was an inconsistency: the
+same file, byte for byte, flagged when scanned directly and clean when scanned inside the
+publish tree.
+
+```
+source md5: e0e63c8f168c557f05e8c595fcf53026
+public md5: e0e63c8f168c557f05e8c595fcf53026
+identical: True
+scan dist/public/BUILD_LOG.public.md -> []
+scan BUILD_LOG.public.md            -> [('BUILD_LOG.public.md', 'an email address')]
+```
+
+Two lessons, and the second is the one that matters:
+
+1. An excluded directory name is a hole in a gate. Narrow the skip list to things that are
+   never published.
+2. **A passing check is not evidence until you have watched it fail.** The gate now has a
+   test that plants a violation inside `dist/`, and the release script is verified by
+   planting a file in the real publish tree and confirming it exits 1.
+
+That second check also caught a false positive worth keeping: `bunx patchright@1.63.0`
+reads as an email address to a loose pattern, so the pattern now requires an alphabetic
+top-level domain.
+
+### 3.13 The test suite was spending the agent's request budget
+
+The bring-up probe — the script that proves the MCP server exposes the four tools the
+agent needs — ran as a normal test. Which meant every `pytest` invocation started a
+browser and searched Walmart.
+
+That is the same budget the agent needs for real runs, so the suite was competing with the
+thing it was testing. It also made the suite take 21 seconds instead of 0.6.
+
+```
+$ pytest tests/ -q
+63 passed, 1 skipped in 0.64s
+```
+
+The probe is now opt-in behind `MEAL_TO_CART_LIVE=1`, and a test asserts the default run
+is offline.
+
+The safety invariant that replaced it is better than the probe anyway: instead of checking
+that a browser works, assert the thing that must never happen. `test_probe.py` now walks
+every source line and fails if the word `checkout` appears anywhere outside the constant
+that declares it forbidden. There is no code path that pays, and the build proves it.
+
 ## 4. What the run does now
 
 ```
 $ meal-to-cart --limit 16 --yes --pause 5
 16 lines to consider (0 of them extras)
 cleared a stale session cookie jar
-status: Not logged in.
+status: Not logged in. Use the `login` tool to authenticate.
   [ 1/16] add  1.00 cucumbers
   [ 2/16] add  1.00 garlic
-...
+  ...
+  [ 5/16] flag 0.50 fingerling potatoes
+
+[add ] 1.00   $2.00  cucumbers            -> Fresh Mini Cucumbers, 16 oz
+[add ] 1.00   $0.00  garlic               -> Garlic Bulb Fresh Whole, Each
+[flag] 0.50   $4.00  fingerling potatoes  -> Fresh Yellow Petite Potatoes, 1.5 lb Bag
+[flag] 0.00       ?  dill                 -> (search failed: WalmartBlocked)
+
+2 matched, 3 need your call
+{
+  "would_add": 0,
+  "added": 2,
+  "denied": 0,
+  "skipped_flagged": 3
+}
+
 STOPPING BEFORE CHECKOUT. Payment is yours to make.
 ```
+
+The last line is the point of the whole thing. The run reaches a real cart with real
+products and real prices, and then it stops and hands over.
+
+Note the flagged potato line: the match is *plausible* — "Fresh Yellow Petite Potatoes,
+1.5 lb Bag" is a real, sensible substitute for fingerling potatoes — and it scored 0.50,
+under the 0.70 bar, so it was flagged rather than added. That is the intended behaviour
+and it is why the threshold is not tuned down to make the demo look better.
 
 68 plan lines become about 45 after the cupboard check and dedupe, and the extras list
 adds breakfast, lunch, snacks, fruit and drinks on top.

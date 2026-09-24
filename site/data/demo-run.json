@@ -1,19 +1,20 @@
 {
   "summary": {
     "would_add": 0,
-    "added": 2,
+    "added": 0,
     "denied": 0,
-    "skipped_flagged": 3
+    "skipped_flagged": 103,
+    "replayed": true
   },
   "results": [
     {
-      "action": "add",
-      "confidence": 1.0,
-      "item_id": "44419690",
-      "title": "Fresh Mini Cucumbers, 16 oz",
-      "price": 2.0,
-      "price_text": "2",
-      "reason": "",
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
       "query": "cucumbers",
       "buy": {
         "item": "cucumbers",
@@ -32,7 +33,7 @@
       "title": "",
       "price": null,
       "price_text": "",
-      "reason": "search failed: WalmartBlocked",
+      "reason": "not searched yet",
       "query": "dill",
       "buy": {
         "item": "dill sprigs",
@@ -51,7 +52,7 @@
       "title": "",
       "price": null,
       "price_text": "",
-      "reason": "search failed: WalmartBlocked",
+      "reason": "not searched yet",
       "query": "english cucumber",
       "buy": {
         "item": "english cucumber",
@@ -65,12 +66,12 @@
     },
     {
       "action": "flag",
-      "confidence": 0.5,
-      "item_id": "44391123",
-      "title": "Fresh Yellow Petite Potatoes, 1.5 lb Bag",
-      "price": 4.0,
-      "price_text": "4",
-      "reason": "only 0.50 confident",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
       "query": "fingerling potatoes",
       "buy": {
         "item": "fingerling potatoes",
@@ -83,13 +84,13 @@
       }
     },
     {
-      "action": "add",
-      "confidence": 1.0,
-      "item_id": "44391100",
-      "title": "Garlic Bulb Fresh Whole, Each",
-      "price": 0.0,
-      "price_text": "0",
-      "reason": "",
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
       "query": "garlic",
       "buy": {
         "item": "garlic cloves",
@@ -100,6 +101,1744 @@
           "Wednesday"
         ],
         "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "grape tomatoes",
+      "buy": {
+        "item": "grape tomatoes",
+        "buy": "4 oz",
+        "aisle": "produce",
+        "meals": [
+          "Thursday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "green bell pepper",
+      "buy": {
+        "item": "green bell pepper",
+        "buy": "0.5",
+        "aisle": "produce",
+        "meals": [
+          "Sunday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "limes",
+      "buy": {
+        "item": "juice of 2 large limes )",
+        "buy": "as needed",
+        "aisle": "produce",
+        "meals": [
+          "Sunday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "zucchini",
+      "buy": {
+        "item": "large zucchini",
+        "buy": "6",
+        "aisle": "produce",
+        "meals": [
+          "Tuesday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "lemon",
+      "buy": {
+        "item": "lemon",
+        "buy": "3 lemons",
+        "aisle": "produce",
+        "meals": [
+          "Saturday",
+          "Wednesday",
+          "Thursday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "parsley",
+      "buy": {
+        "item": "parsley",
+        "buy": "1 bunch",
+        "aisle": "produce",
+        "meals": [
+          "Saturday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "roma tomatoes",
+      "buy": {
+        "item": "roma tomatoes",
+        "buy": "3",
+        "aisle": "produce",
+        "meals": [
+          "Sunday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "shredded lettuce",
+      "buy": {
+        "item": "shredded lettuce",
+        "buy": "as needed",
+        "aisle": "produce",
+        "meals": [
+          "Monday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "onion",
+      "buy": {
+        "item": "small onion",
+        "buy": "2",
+        "aisle": "produce",
+        "meals": [
+          "Saturday",
+          "Tuesday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "chives",
+      "buy": {
+        "item": "tablespoon fresh chives",
+        "buy": "1 bunch",
+        "aisle": "produce",
+        "meals": [
+          "Friday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "dried mint",
+      "buy": {
+        "item": "tbsp dried mint",
+        "buy": "1 bunch",
+        "aisle": "produce",
+        "meals": [
+          "Sunday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "dried basil",
+      "buy": {
+        "item": "teaspoon dried basil",
+        "buy": "1 bunch",
+        "aisle": "produce",
+        "meals": [
+          "Friday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "dried parsley",
+      "buy": {
+        "item": "teaspoon dried parsley",
+        "buy": "1 bunch",
+        "aisle": "produce",
+        "meals": [
+          "Friday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "onions",
+      "buy": {
+        "item": "to 1/2 cup onions",
+        "buy": "0.25",
+        "aisle": "produce",
+        "meals": [
+          "Sunday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "tomatoes",
+      "buy": {
+        "item": "tomatoes",
+        "buy": "as needed",
+        "aisle": "produce",
+        "meals": [
+          "Saturday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "yellow onion",
+      "buy": {
+        "item": "yellow onion",
+        "buy": "1",
+        "aisle": "produce",
+        "meals": [
+          "Wednesday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "skirt steak",
+      "buy": {
+        "item": "lbs flank or skirt steak",
+        "buy": "1.5",
+        "aisle": "meat",
+        "meals": [
+          "Saturday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "leg of lamb",
+      "buy": {
+        "item": "pound boneless lamb loin or boneless leg of lamb",
+        "buy": "1.5",
+        "aisle": "meat",
+        "meals": [
+          "Wednesday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "chicken breast",
+      "buy": {
+        "item": "pound chicken breast cut in half",
+        "buy": "1 + 2 cups",
+        "aisle": "meat",
+        "meals": [
+          "Monday",
+          "Friday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "ground beef",
+      "buy": {
+        "item": "pound lean ground beef",
+        "buy": "1",
+        "aisle": "meat",
+        "meals": [
+          "Tuesday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "salmon fillets",
+      "buy": {
+        "item": "salmon fillets",
+        "buy": "12 oz",
+        "aisle": "seafood",
+        "meals": [
+          "Thursday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "buttermilk",
+      "buy": {
+        "item": "1% buttermilk",
+        "buy": "0.5 cup",
+        "aisle": "dairy",
+        "meals": [
+          "Friday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "lemon garlic butter",
+      "buy": {
+        "item": "lemon garlic butter",
+        "buy": "0.8 oz",
+        "aisle": "dairy",
+        "meals": [
+          "Thursday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "shredded colby jack cheese",
+      "buy": {
+        "item": "shredded colby jack cheese",
+        "buy": "as needed",
+        "aisle": "dairy",
+        "meals": [
+          "Monday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "shredded mozzarella cheese",
+      "buy": {
+        "item": "shredded mozzarella cheese",
+        "buy": "2 cups",
+        "aisle": "dairy",
+        "meals": [
+          "Tuesday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "pita breads for wraps",
+      "buy": {
+        "item": "pita breads for wraps",
+        "buy": "as needed",
+        "aisle": "bakery",
+        "meals": [
+          "Saturday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "tomato sauce",
+      "buy": {
+        "item": "(15oz tomato sauce)",
+        "buy": "1 can",
+        "aisle": "pantry",
+        "meals": [
+          "Tuesday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "flour tortillas",
+      "buy": {
+        "item": "flour tortillas",
+        "buy": "as needed",
+        "aisle": "pantry",
+        "meals": [
+          "Monday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "garlic aioli",
+      "buy": {
+        "item": "garlic aioli",
+        "buy": "2 fl oz",
+        "aisle": "pantry",
+        "meals": [
+          "Thursday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "mayonnaise",
+      "buy": {
+        "item": "mayonnaise",
+        "buy": "1 cup",
+        "aisle": "pantry",
+        "meals": [
+          "Monday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "yellow mustard",
+      "buy": {
+        "item": "tablespoon yellow mustard",
+        "buy": "1",
+        "aisle": "pantry",
+        "meals": [
+          "Monday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "worcestershire sauce",
+      "buy": {
+        "item": "tablespoons worcestershire sauce",
+        "buy": "2",
+        "aisle": "pantry",
+        "meals": [
+          "Tuesday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "tahini sauce",
+      "buy": {
+        "item": "tahini sauce",
+        "buy": "as needed",
+        "aisle": "pantry",
+        "meals": [
+          "Saturday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "pickles",
+      "buy": {
+        "item": "pickles",
+        "buy": "as needed",
+        "aisle": "other",
+        "meals": [
+          "Saturday"
+        ],
+        "source": "plan"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "frozen breakfast sandwiches, turkey sausage",
+      "buy": {
+        "item": "frozen breakfast sandwiches, turkey sausage",
+        "buy": "1 box",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "asiago bagels",
+      "buy": {
+        "item": "asiago bagels",
+        "buy": "1 pack",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "lactose free cream cheese",
+      "buy": {
+        "item": "lactose free cream cheese",
+        "buy": "1 tub",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "sliced turkey breast, sealed pack",
+      "buy": {
+        "item": "sliced turkey breast, sealed pack",
+        "buy": "1 pack",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "cucumber",
+      "buy": {
+        "item": "cucumber",
+        "buy": "2",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "tomato",
+      "buy": {
+        "item": "tomato",
+        "buy": "3",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "lactose free greek yogurt",
+      "buy": {
+        "item": "lactose free greek yogurt",
+        "buy": "1 tub",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "berry preserves",
+      "buy": {
+        "item": "berry preserves",
+        "buy": "1 jar",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "ready made acai bowls",
+      "buy": {
+        "item": "ready made acai bowls",
+        "buy": "2",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "cinnamon toast crunch cereal",
+      "buy": {
+        "item": "cinnamon toast crunch cereal",
+        "buy": "1 box",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "fairlife core power protein shake",
+      "buy": {
+        "item": "fairlife core power protein shake",
+        "buy": "4",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "hard boiled eggs, pre",
+      "buy": {
+        "item": "hard boiled eggs, pre peeled",
+        "buy": "2 packs",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "frozen smoothie packs",
+      "buy": {
+        "item": "frozen smoothie packs",
+        "buy": "1 box",
+        "aisle": "Breakfast",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "turkey and cheese cracker packs",
+      "buy": {
+        "item": "turkey and cheese cracker packs",
+        "buy": "1 box",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "cooked chicken strips, frozen",
+      "buy": {
+        "item": "cooked chicken strips, frozen",
+        "buy": "2 bags",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "romaine lettuce",
+      "buy": {
+        "item": "romaine lettuce",
+        "buy": "2 heads",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "caesar dressing",
+      "buy": {
+        "item": "caesar dressing",
+        "buy": "1 bottle",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "buffalo sauce",
+      "buy": {
+        "item": "buffalo sauce",
+        "buy": "1 bottle",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "flour tortillas",
+      "buy": {
+        "item": "large flour tortillas",
+        "buy": "1 pack",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "hummus",
+      "buy": {
+        "item": "hummus",
+        "buy": "1 tub",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "pita bread",
+      "buy": {
+        "item": "pita bread",
+        "buy": "1 pack",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "pre cut vegetables",
+      "buy": {
+        "item": "pre cut vegetables",
+        "buy": "2 packs",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "shredded cheese",
+      "buy": {
+        "item": "shredded cheese",
+        "buy": "1 bag",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "frozen burritos",
+      "buy": {
+        "item": "frozen burritos",
+        "buy": "1 box",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "mac and cheese cups",
+      "buy": {
+        "item": "mac and cheese cups",
+        "buy": "4",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "frozen flatbread pizza",
+      "buy": {
+        "item": "frozen flatbread pizza",
+        "buy": "2",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "ramen noodles",
+      "buy": {
+        "item": "ramen noodles",
+        "buy": "4",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "cottage cheese, lactose free",
+      "buy": {
+        "item": "cottage cheese, lactose free",
+        "buy": "1 tub",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "refrigerated soup",
+      "buy": {
+        "item": "fresh refrigerated soup",
+        "buy": "2",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "iceberg lettuce",
+      "buy": {
+        "item": "iceberg lettuce",
+        "buy": "1 head",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "turkey bacon",
+      "buy": {
+        "item": "turkey bacon",
+        "buy": "1 pack",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "pickled onions",
+      "buy": {
+        "item": "pickled onions",
+        "buy": "1 jar",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "blue cheese dressing",
+      "buy": {
+        "item": "blue cheese dressing",
+        "buy": "1 bottle",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "gorgonzola crumbles",
+      "buy": {
+        "item": "gorgonzola crumbles",
+        "buy": "1 tub",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "spring mix",
+      "buy": {
+        "item": "spring mix",
+        "buy": "2 packs",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "pears",
+      "buy": {
+        "item": "pears",
+        "buy": "3",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "candied walnuts",
+      "buy": {
+        "item": "candied walnuts",
+        "buy": "1 bag",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "pomegranate seeds",
+      "buy": {
+        "item": "pomegranate seeds",
+        "buy": "1 pack",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "truffle honey",
+      "buy": {
+        "item": "truffle honey",
+        "buy": "1 jar",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "arugula",
+      "buy": {
+        "item": "arugula",
+        "buy": "1 pack",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "marcona almonds",
+      "buy": {
+        "item": "marcona almonds",
+        "buy": "1 bag",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "sirloin steak",
+      "buy": {
+        "item": "sirloin steak",
+        "buy": "1 lb",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "salmon fillet",
+      "buy": {
+        "item": "salmon fillet",
+        "buy": "1 lb",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "figs",
+      "buy": {
+        "item": "figs",
+        "buy": "6",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "burrata",
+      "buy": {
+        "item": "burrata",
+        "buy": "2",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "balsamic vinegar",
+      "buy": {
+        "item": "balsamic vinegar",
+        "buy": "1 bottle",
+        "aisle": "Lunch",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "cheese and nuts snack packs",
+      "buy": {
+        "item": "cheese and nuts snack packs",
+        "buy": "1 box",
+        "aisle": "Snack",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "chocolate covered pretzels",
+      "buy": {
+        "item": "chocolate covered pretzels",
+        "buy": "1 bag",
+        "aisle": "Snack",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "guacamole cups",
+      "buy": {
+        "item": "guacamole cups",
+        "buy": "1 box",
+        "aisle": "Snack",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "tortilla chips",
+      "buy": {
+        "item": "tortilla chips",
+        "buy": "1 bag",
+        "aisle": "Snack",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "antipasto snack pack with olives",
+      "buy": {
+        "item": "antipasto snack pack with olives",
+        "buy": "1 box",
+        "aisle": "Snack",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "sour patch kids",
+      "buy": {
+        "item": "sour patch kids",
+        "buy": "1 bag",
+        "aisle": "Candy",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "starburst",
+      "buy": {
+        "item": "starburst",
+        "buy": "1 bag",
+        "aisle": "Candy",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "skittles",
+      "buy": {
+        "item": "skittles",
+        "buy": "1 bag",
+        "aisle": "Candy",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "sour rings gummy candy",
+      "buy": {
+        "item": "sour rings gummy candy",
+        "buy": "1 bag",
+        "aisle": "Candy",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "apple juice",
+      "buy": {
+        "item": "apple juice",
+        "buy": "1 bottle",
+        "aisle": "Drink",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "orange juice",
+      "buy": {
+        "item": "orange juice",
+        "buy": "1 bottle",
+        "aisle": "Drink",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "squeezed juice",
+      "buy": {
+        "item": "fresh squeezed juice",
+        "buy": "1 bottle",
+        "aisle": "Drink",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "apples",
+      "buy": {
+        "item": "apples",
+        "buy": "1",
+        "aisle": "Fruit",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "clementines",
+      "buy": {
+        "item": "clementines",
+        "buy": "1",
+        "aisle": "Fruit",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "strawberries",
+      "buy": {
+        "item": "strawberries",
+        "buy": "1",
+        "aisle": "Fruit",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "blueberries",
+      "buy": {
+        "item": "blueberries",
+        "buy": "1",
+        "aisle": "Fruit",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "cotton candy grapes",
+      "buy": {
+        "item": "cotton candy grapes",
+        "buy": "1",
+        "aisle": "Fruit",
+        "meals": [],
+        "source": "extras"
+      }
+    },
+    {
+      "action": "flag",
+      "confidence": 0.0,
+      "item_id": null,
+      "title": "",
+      "price": null,
+      "price_text": "",
+      "reason": "not searched yet",
+      "query": "raspberries",
+      "buy": {
+        "item": "raspberries",
+        "buy": "1",
+        "aisle": "Fruit",
+        "meals": [],
+        "source": "extras"
       }
     }
   ]

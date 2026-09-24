@@ -18,7 +18,7 @@ from .load import load_extras, load_shopping
 from .match import score
 from .models import MatchResult
 from .normalize import normalize_query
-from .walmart import WalmartMCP, reset_session
+from .walmart import WalmartMCP, load_cache, reset_session
 
 RUNS = Path(__file__).resolve().parents[2] / "site" / "data"
 
@@ -68,10 +68,31 @@ async def run(args) -> int:
                        "skipped_flagged": len(results)}, RUNS / "dry-run.json")
         return 0
 
+    if args.replay:
+        cache = load_cache()
+        results = []
+        for buy in buys:
+            query = normalize_query(buy.item)
+            candidates = cache.get(query)
+            if candidates is None:
+                results.append(MatchResult(buy=buy, query=query, action="flag",
+                                           reason="not searched yet"))
+            else:
+                results.append(score(buy, query, candidates))
+        print(render(results))
+        known = [r for r in results if r.item_id is not None]
+        print(f"\n[replay] {len(known)}/{len(results)} lines matched from cache, "
+              f"no network used")
+        dump(results, {"would_add": len(known), "added": 0, "denied": 0,
+                       "skipped_flagged": len(results) - len(known),
+                       "replayed": True},
+             RUNS / "demo-run.json")
+        return 0
+
     if reset_session():
         print("cleared a stale session cookie jar")
 
-    async with WalmartMCP() as wm:
+    async with WalmartMCP(use_cache=not args.no_cache) as wm:
         print("status:", (await wm.status()).splitlines()[0])
 
         def progress(index: int, total: int, result: MatchResult) -> None:
@@ -79,6 +100,8 @@ async def run(args) -> int:
                   f"{result.confidence:.2f} {normalize_query(result.buy.item)}")
 
         results = await build_plan(buys, wm, on_progress=progress, pause=args.pause)
+        if wm.hits:
+            print(f"  ({wm.hits} of {len(buys)} answered from cache)")
         print()
         print(render(results))
         flagged = [r for r in results if r.action != "add"]
@@ -110,11 +133,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--shopping", default=str(root / "data/sample/shopping.sample.json"))
     parser.add_argument("--extras", default=str(root / "data/extras.json"))
     parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--pause", type=float, default=1.5,
-                        help="seconds between searches, to stay under bot detection")
+    parser.add_argument("--pause", type=float, default=25.0,
+                        help="seconds between searches; Walmart blocks on rate")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--yes", action="store_true",
                         help="auto-approve matches (still never checks out)")
+    parser.add_argument("--replay", action="store_true",
+                        help="rebuild the full plan from cached searches, offline")
+    parser.add_argument("--no-cache", action="store_true",
+                        help="ignore cached searches and hit the network")
     args = parser.parse_args(argv)
     if not args.dry_run:
         args.live = True

@@ -79,10 +79,16 @@ The launch flags and the injected stealth script made no difference; the version
 alone decided it. `scripts/patch_mcp.py` reads the real version off the bundled browser
 and writes that into the User-Agent, so it stays true after an upgrade.
 
-**3. A blocked page poisons the session permanently.** The server saves cookies even when
-the page it got back is the bot wall. Those cookies carry the block fingerprint
-(`_pxvid`, `pxcts`, `btc`, `bsc`, `vtc`), and every later run reloads them. Deleting one
-file fixes it; the patch makes the server say `BLOCKED_BY_WALMART` so the agent knows to.
+**3. A blocked page poisons the session, and rotating the browser does not fix it.** The
+server saves cookies even when the page it got back is the bot wall, and those cookies
+carry the block fingerprint (`_pxvid`, `pxcts`, `btc`, `bsc`, `vtc`). The obvious fix —
+tear the browser down, clear the jar, start over — **does not work**, and measuring it is
+what showed why: every fresh session presents the same visitor id. It is a request *rate*,
+not a session. Two searches go through and then the wall comes down, every time.
+
+The answer is to not ask twice: every search is cached, so a weekly re-run over the same
+forty products costs no requests at all, and a cold run paces itself at 25 seconds a
+query. `meal-to-cart --replay` rebuilds the entire plan from cache with no network.
 
 **4. Prose is not a product.** The real list contains `juice of 2 large limes )`,
 `to 1/2 cup onions`, `(15oz tomato sauce)`, `1% buttermilk`, `teaspoon cinnamon` *and*

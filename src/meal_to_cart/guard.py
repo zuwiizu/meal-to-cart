@@ -26,7 +26,8 @@ TERMS_FILE = ROOT / "data" / "private-terms.txt"
 _COOKIE = r"sessionid|_pxvid|pxcts|bstc|_astc"
 
 SHAPES: list[tuple[re.Pattern[str], str]] = [
-    (re.compile(r"[\w.+-]+@[\w-]+\.[\w.]{2,}"), "an email address"),
+    # An alphabetic TLD, so 'patchright@1.63.0' is not mistaken for an address.
+    (re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}\b"), "an email address"),
     (re.compile(r"\b\d{2,6}\s+[A-Z][a-z]+\s+"
                 r"(?:St|Street|Ave|Avenue|Rd|Road|Ln|Lane|Dr|Drive|Blvd|Ct|Way)\b"),
      "a street address"),
@@ -38,7 +39,13 @@ SHAPES: list[tuple[re.Pattern[str], str]] = [
      "a postal code"),
 ]
 
-SKIP_PARTS = {".git", "__pycache__", "node_modules", ".venv", "dist"}
+# 'dist' must NOT be here. It was, and it made the guard silently scan nothing
+# when pointed at the publish directory -- a gate that passed by skipping every
+# file. test_guard.py::test_a_dist_directory_is_not_skipped locks this down.
+SKIP_PARTS = {".git", "__pycache__", "node_modules", ".venv"}
+# The term list itself is the one file that must contain the terms. It is
+# gitignored and the public tree builder copies only the example file.
+SKIP_NAMES = {"private-terms.txt"}
 
 
 def load_terms(path: Path | None = None) -> list[str]:
@@ -62,7 +69,7 @@ def scan(paths, terms: list[str] | None = None) -> list[tuple[str, str]]:
             continue
         files = [p] if p.is_file() else sorted(f for f in p.rglob("*") if f.is_file())
         for f in files:
-            if any(part in SKIP_PARTS for part in f.parts):
+            if f.name in SKIP_NAMES or any(part in SKIP_PARTS for part in f.parts):
                 continue
             try:
                 text = f.read_text(errors="ignore")

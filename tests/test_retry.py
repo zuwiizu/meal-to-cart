@@ -1,4 +1,8 @@
-"""A blocked search must rotate the session, not just wait longer."""
+"""A blocked search waits out the rate limit; it does not rotate the browser.
+
+Rotating was tried and does not work: the block URL carries the same visitor id
+across fresh sessions with an empty cookie jar.
+"""
 import asyncio
 
 import pytest
@@ -14,7 +18,6 @@ class FlakyMatcher:
     def __init__(self, fail_times: int):
         self.fail_times = fail_times
         self.calls = 0
-        self.restarts = 0
 
     async def search(self, query, limit=5):
         self.calls += 1
@@ -22,27 +25,17 @@ class FlakyMatcher:
             raise WalmartBlocked(query)
         return PRODUCT
 
-    async def restart(self):
-        self.restarts += 1
-
 
 @pytest.fixture(autouse=True)
 def no_backoff(monkeypatch):
-    """The real backoff is seconds long; the test only cares about the order."""
+    """The real backoff is 45 seconds; the test only cares about the sequence."""
     monkeypatch.setattr(cart, "BLOCK_BACKOFF", 0.0)
 
 
-def test_a_block_rotates_the_session_then_succeeds():
+def test_a_block_waits_then_succeeds():
     matcher = FlakyMatcher(fail_times=1)
     assert asyncio.run(_search_with_retry(matcher, "dill")) == PRODUCT
     assert matcher.calls == 2
-    assert matcher.restarts == 1
-
-
-def test_two_blocks_rotate_twice():
-    matcher = FlakyMatcher(fail_times=2)
-    assert asyncio.run(_search_with_retry(matcher, "dill")) == PRODUCT
-    assert matcher.restarts == 2
 
 
 def test_a_permanent_block_gives_up_rather_than_looping():
@@ -50,3 +43,14 @@ def test_a_permanent_block_gives_up_rather_than_looping():
     with pytest.raises(WalmartBlocked):
         asyncio.run(_search_with_retry(matcher, "dill"))
     assert matcher.calls == cart.BLOCK_ATTEMPTS
+
+
+def test_a_block_never_calls_restart_because_rotation_does_not_help():
+    class Watched(FlakyMatcher):
+        restarts = 0
+
+        async def restart(self):
+            Watched.restarts += 1
+
+    asyncio.run(_search_with_retry(Watched(fail_times=1), "dill"))
+    assert Watched.restarts == 0

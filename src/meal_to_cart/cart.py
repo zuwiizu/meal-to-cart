@@ -15,12 +15,12 @@ from .walmart import WalmartBlocked
 
 Approver = Callable[[MatchResult], bool]
 
-# Walmart answers a burst of searches with its bot wall. Waiting is not enough:
-# the block is sticky for the life of one browser session, and the server keeps
-# saving the block page's cookies. Rotating the session is what actually clears
-# it, so a retry means a new browser, not a longer pause.
-BLOCK_ATTEMPTS = 3
-BLOCK_BACKOFF = 5.0
+# Walmart blocks on request rate. Rotating the browser does NOT clear it: the
+# block URL carries the same visitor id across brand-new sessions with an empty
+# cookie jar, so what it fingerprints (address plus browser identity) is stable.
+# The only thing that works is asking less often, so a retry is a long wait.
+BLOCK_ATTEMPTS = 2
+BLOCK_BACKOFF = 45.0
 
 
 async def _search_with_retry(matcher, query: str, limit: int = 5) -> list[dict]:
@@ -33,9 +33,7 @@ async def _search_with_retry(matcher, query: str, limit: int = 5) -> list[dict]:
         except WalmartBlocked as exc:
             last = exc
             if attempt < BLOCK_ATTEMPTS - 1:
-                if hasattr(matcher, "restart"):
-                    await matcher.restart()
-                await asyncio.sleep(BLOCK_BACKOFF * (attempt + 1))
+                await asyncio.sleep(BLOCK_BACKOFF)
     raise last if last else RuntimeError("unreachable")
 
 

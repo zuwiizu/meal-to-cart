@@ -38,6 +38,20 @@ def test_guard_flags_a_session_cookie_name(tmp_path):
     assert any("cookie" in what for _, what in scan([planted], terms=FAKE))
 
 
+def test_a_dist_directory_is_not_skipped(tmp_path):
+    """The publish tree lives in dist/. Skipping that name skipped the whole gate."""
+    planted = tmp_path / "dist" / "public" / "leak.md"
+    planted.parent.mkdir(parents=True)
+    planted.write_text("this mentions WIDGETCO")
+    assert scan([tmp_path / "dist"], terms=FAKE)
+
+
+def test_a_version_string_is_not_an_email(tmp_path):
+    fine = tmp_path / "log.md"
+    fine.write_text("$ bunx patchright@1.63.0 install chromium")
+    assert scan([fine], terms=FAKE) == []
+
+
 def test_clean_files_pass(tmp_path):
     fine = tmp_path / "fine.md"
     fine.write_text("a normal sentence about groceries and recipes")

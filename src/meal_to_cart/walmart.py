@@ -56,6 +56,14 @@ _PRODUCT = re.compile(
 )
 
 
+# The agent may search, read a cart, and write items into it. It may not pay.
+ALLOWED_TOOLS = {
+    "search", "get_product", "add_to_cart", "view_cart", "update_cart",
+    "remove_from_cart", "set_address", "status", "login", "logout", "get_orders",
+}
+NEVER_CALLED = {"checkout"}
+
+
 class WalmartBlocked(RuntimeError):
     """Walmart served the bot wall. The session cookie jar is poisoned."""
 
@@ -94,6 +102,25 @@ def reset_session() -> bool:
     return False
 
 
+CACHE_PATH = CACHE / "search-cache.json"
+
+
+def load_cache(path: Path | None = None) -> dict[str, list[dict]]:
+    source = path or CACHE_PATH
+    if not source.exists():
+        return {}
+    try:
+        return json.loads(source.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def save_cache(data: dict[str, list[dict]], path: Path | None = None) -> None:
+    target = path or CACHE_PATH
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(data, indent=1, sort_keys=True))
+
+
 def _text(result: Any) -> str:
     return "\n".join(
         p for p in (getattr(c, "text", "") for c in getattr(result, "content", [])) if p
@@ -127,9 +154,16 @@ def parse_search(text: str) -> list[dict]:
 class WalmartMCP:
     """Async context manager holding one stdio session for the whole run."""
 
-    def __init__(self) -> None:
+    def __init__(self, use_cache: bool = True) -> None:
         self._stack = AsyncExitStack()
         self.session: ClientSession | None = None
+        # Walmart blocks on request rate, and rotating the browser does not help:
+        # the block URL carries the same visitor id across fresh sessions, so
+        # what it fingerprints is stable. Not asking twice is the real fix, and
+        # it makes re-running the plan free.
+        self.use_cache = use_cache
+        self.cache = load_cache()
+        self.hits = 0
 
     async def __aenter__(self) -> "WalmartMCP":
         read, write = await self._stack.enter_async_context(stdio_client(server_params()))
@@ -144,30 +178,23 @@ class WalmartMCP:
         assert self.session is not None, "session not started"
         return _text(await self.session.call_tool(tool, args))
 
-    async def restart(self) -> None:
-        """Drop the browser session and the cookie jar, then reconnect.
-
-        A block is sticky for the life of one browser session: the same block
-        uuid comes back on every retry, as this run's log shows twice for the
-        same query. Waiting does not clear it and the cookie jar actively
-        preserves it. A new browser with a clean jar is what clears it.
-        """
-        try:
-            await self._stack.aclose()
-        finally:
-            self._stack = AsyncExitStack()
-            reset_session()
-            await self.__aenter__()
-
     async def status(self) -> str:
         return await self.call("status", {})
 
     async def search(self, query: str, limit: int = 5) -> list[dict]:
-        """Search and parse. Raises WalmartBlocked so the caller can recover."""
+        """Search, parse, and remember. Raises WalmartBlocked so the caller can recover."""
+        key = query.strip().lower()
+        if self.use_cache and key in self.cache:
+            self.hits += 1
+            return self.cache[key]
         raw = await self.call("search", {"query": query, "limit": limit})
         if BLOCK_MARKER in raw:
             raise WalmartBlocked(query)
-        return parse_search(raw)
+        products = parse_search(raw)
+        if self.use_cache and products:
+            self.cache[key] = products
+            save_cache(self.cache)
+        return products
 
     async def add(self, item_id: str, quantity: int = 1) -> str:
         return await self.call("add_to_cart", {"item_id": item_id, "quantity": quantity})
