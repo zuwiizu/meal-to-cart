@@ -369,6 +369,23 @@ User-Agent problem announced itself as an error. This one announced itself as su
 it was only caught by reading the actual matched titles in a real run rather than trusting
 the confidence number.
 
+### 3.15 Splitting ingredients on every comma
+
+The recipe importer split a semicolon-joined string into lines, and used the same
+separator set when the recipe was already a clean list of ingredients. Every
+`schema.org/Recipe` publishes `recipeIngredient` as a list, one ingredient per entry.
+
+So `"1 onion, diced"` became two ingredients, `1 onion` and `diced`. A test caught it:
+
+```
+assert "1 onion, diced" in recipe.ingredients
+assert "diced" not in recipe.ingredients
+```
+
+The second line is the one that matters. Without it the test passes on the mangled
+output too. A comma inside an ingredient belongs to the ingredient; only a raw string
+needs splitting, and only on newlines and semicolons.
+
 ## 4. What the run does now
 
 ```

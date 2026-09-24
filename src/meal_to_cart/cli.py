@@ -14,20 +14,35 @@ from datetime import date
 from pathlib import Path
 
 from .cart import apply, build_plan, render
-from .load import load_extras, load_shopping
+from .load import dedupe, load_extras, load_shopping
 from .match import score
-from .models import MatchResult
+from .models import Buy, MatchResult
 from .normalize import canonical, normalize_query
 from .pantry import candidates, filter_buys, group_for, load_catalog
+from .recipes import from_url, load_import
 from .store import Store
 from .walmart import WalmartMCP, load_cache, reset_session
 
 RUNS = Path(__file__).resolve().parents[2] / "site" / "data"
 
 
+def recipe_buys(store: Store) -> list[Buy]:
+    """Saved recipe ingredients, as shopping lines."""
+    out: list[Buy] = []
+    for recipe in store.recipes():
+        for line in recipe["ingredients"]:
+            out.append(Buy(item=line, buy=line, aisle="", meals=[recipe["title"]],
+                           need=line, approximate=False, spare="",
+                           source="recipe:" + (recipe["title"] or recipe["url"])))
+    return out
+
+
 def collect(shopping: str, extras: str, limit: int | None,
             store: Store | None = None) -> list:
     buys = load_shopping(shopping) + load_extras(extras, on=date.today())
+    if store is not None:
+        buys += recipe_buys(store)
+        buys = dedupe(buys)
     if store is not None:
         buys, on_hand = filter_buys(buys, store)
         if on_hand:
@@ -94,6 +109,39 @@ async def run(args) -> int:
         if args.forget_pantry:
             store.forget_pantry(args.forget_pantry)
             print(f"pantry: forgot {args.forget_pantry}")
+        if args.recipes:
+            saved = store.recipes()
+            if not saved:
+                print("no saved recipes yet; add one with --add-recipe URL")
+            for recipe in saved:
+                print(f"  {recipe['title'] or '(untitled)'}  "
+                      f"[{len(recipe['ingredients'])} ingredients]  {recipe['url']}")
+            return 0
+        if args.import_recipes:
+            imported = load_import(args.import_recipes)
+            for recipe in imported:
+                store.add_recipe(recipe.url, recipe.title, recipe.source,
+                                 recipe.ingredients, verified=False)
+            print(f"imported {len(imported)} recipe(s)")
+            return 0
+        if args.add_recipe:
+            added = 0
+            for url in args.add_recipe:
+                try:
+                    recipe = from_url(url)
+                except Exception as exc:  # noqa: BLE001 - a bad link must not kill the run
+                    print(f"  could not read {url}: {exc}")
+                    continue
+                if recipe is None or not recipe.ok:
+                    print(f"  no recipe found at {url} "
+                          f"(no schema.org/Recipe block)")
+                    continue
+                store.add_recipe(recipe.url, recipe.title, recipe.source,
+                                 recipe.ingredients)
+                print(f"  saved {recipe.title} ({len(recipe.ingredients)} ingredients)")
+                added += 1
+            print(f"added {added} recipe(s)")
+            return 0
         if args.pantry:
             return run_pantry(args.shopping, args.extras, store)
         return await _run(args, store)
@@ -185,6 +233,11 @@ def main(argv: list[str] | None = None) -> int:
                         help="auto-approve matches (still never checks out)")
     parser.add_argument("--pantry", action="store_true",
                         help="ask which staples you already have, and remember")
+    parser.add_argument("--add-recipe", metavar="URL", action="append", default=[],
+                        help="save a recipe link and pull its ingredients (repeatable)")
+    parser.add_argument("--import-recipes", metavar="FILE",
+                        help="import recipes the agent extracted from social video")
+    parser.add_argument("--recipes", action="store_true", help="list saved recipes")
     parser.add_argument("--forget-pantry", metavar="ITEM",
                         help="forget one pantry answer, so it asks again")
     parser.add_argument("--replay", action="store_true",

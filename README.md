@@ -142,6 +142,27 @@ The second run is silent, and afterwards the shopping list simply omits them. An
 State lives in one gitignored SQLite file: pantry answers, saved recipe links, and what
 each week's run proposed and what you approved.
 
+## Recipes from links
+
+`--add-recipe URL` saves a link and pulls its ingredient list. Most recipe sites already
+publish the recipe in machine-readable form — a `schema.org/Recipe` block in a JSON-LD
+script tag — so the default path is a JSON parse. No model, no API key, no HTML guessing.
+
+```
+$ meal-to-cart --add-recipe https://www.seriouseats.com/classic-panzanella-salad-recipe
+  saved Classic Panzanella Salad (Tuscan-Style Tomato and Bread Salad) (10 ingredients)
+added 1 recipe(s)
+```
+
+Those ingredients then join the shopping list, deduped against everything else. Sites that
+block non-browser fetches (`cookieandkate.com` answers 403) are reported as a skip rather
+than a crash.
+
+Social video has no such block. That path is yt-dlp for the caption, then a model —
+heavier, and it needs a key. Rather than hide that behind a flag, the agent extracts those
+and imports them through `--import-recipes`, which accepts the same shape this module
+produces. One code path, two ways in.
+
 ## Laya and Jev
 
 Both are optional local advisors, reached over the same MCP transport `walmart.py`
