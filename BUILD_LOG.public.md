@@ -437,3 +437,55 @@ adds breakfast, lunch, snacks, fruit and drinks on top.
 | Surface, guard, docs | ~40 min |
 
 The bot wall ate the single largest block of time, and none of it was planned for.
+
+---
+
+## 6. The rebuild: the simple path (2026-09-29)
+
+Everything above is the first build, and it stays because it is the record: the cart path
+was browser automation, and the bot wall fought it at every step. The rebuild replaces
+that path with a plain HTTP read of the store's own search page. One GET per query. No
+browser, no MCP server, no cookie jar, no stealth script, no login. The store ships its
+search results as an embedded `__NEXT_DATA__` JSON blob — the page is a Next.js app, and
+that blob exists to be machine-read. When it is absent, the reader raises instead of
+guessing from markup.
+
+The engine was rebuilt to the runtime API the companion wizard app
+(`zuwiizu/meal-to-cart-app`) already pins in its own tests, so both halves talk the same
+shapes: importer → mealplan → gateway, with `resolve.py` as the seam. A line becomes a
+product or a **named refusal**; a cart link is only rendered when nothing is left
+unnamed. Retired with the rebuild: the MCP boundary, the pantry, the SQLite store, the
+local-advisor module, and the old CLI surface.
+
+### 6.1 What broke in the rebuild (live, with the store's real titles)
+
+**Commas hid the phrase.** The scorer first checked `" garlic powder "` as a substring.
+The store's best tiles say `Garlic Powder, 3.4 oz` — comma, not space — so the phrase
+check failed, the row fell back to a single-token match, and a perfect product scored
+0.26 and was refused. The same family of bug let `case` fire inside "Casero" (a false
+bulk flag) and kept `lemons` from meeting `lemon`. Fixed by matching word runs
+(punctuation cannot hide a phrase), folding plurals symmetrically on both sides, and
+matching bulk words as whole words. `Garlic Powder, 3.4 oz` now scores 0.85 and adds.
+
+**The ad block pushed real food off the shelf.** `lemon` was refused at 0.60: the first
+five tiles were an enhancer, lemonades and juice packets. Tile six was
+`Fresh Lemons, 2 lb Bag` at 0.85. The shelf was widened to ten and the lemon resolves.
+The first five results at this store are, quite literally, the ads.
+
+**What is still refused, on purpose.** The real recipe says "1/2 teaspoon dried herbs
+(such as herbes de provence or dried oregano)". The store sells no product called
+"herbs", and every candidate within ten tiles is a specific herb the recipe did not name
+(oregano, thyme, parsley...). The pipeline refuses the line and says why. A named hole
+beats a wrong item in a cart; the refusal is the product working.
+
+### 6.2 Evidence (live, 2026-09-29)
+
+- Import of a real creator link (`skinnytaste.com/air-fryer-chicken-thighs`) → title,
+  creator, 8 ingredients with amounts, confidence 0.95, from the page's own JSON-LD.
+- The committed fixture run matches 8 of 8 lines; pointed at the app repo's profile
+  (`MTC_ROOT=../meal-to-cart-app`) it renders a cart link with real usItemIds —
+  `44391659` = "Fresh Lemons, 2 lb Bag", `676979470` = "Great Value Garlic Powder".
+- The same real link run end-to-end through the wizard's agent: 200 OK, 7 of 8 lines
+  matched, the eighth is the "herbs" refusal above.
+- Tests: engine green (1 skip: per-machine terms file), wizard app green (2 skips, same
+  reason). `python -m meal_to_cart.guard` passes on both trees.

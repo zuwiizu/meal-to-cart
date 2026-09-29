@@ -1,254 +1,180 @@
-"""meal-to-cart: weekly dinner plan -> reviewed Walmart cart.
+"""The household's own run: links in, week out, no browser anywhere.
 
-    python -m meal_to_cart.cli --dry-run          # no network, no credentials
-    python -m meal_to_cart.cli --live --limit 8   # real searches, real cart
+    python3 -m meal_to_cart.cli --link https://... [--link https://...]
+                                 [--profile demo] [--json out.json]
 
-The run always stops before payment. There is no code path that pays.
+The same pipeline the app drives -- importer, planner, grocery, shopping,
+the seam, the gateway -- assembled here so the household can run it from a
+terminal and a reviewer can watch every step without a browser. It prints
+the week, the list, the refusals and the cart link, and it never checks
+anything out.
 """
 from __future__ import annotations
 
 import argparse
 import asyncio
 import json
-from datetime import date
-from pathlib import Path
+import sys
 
-from .cart import apply, build_plan, render
-from .load import dedupe, load_extras, load_shopping
-from .match import score
-from .models import Buy, MatchResult
-from .normalize import canonical, normalize_query
-from .pantry import candidates, filter_buys, group_for, load_catalog
-from .recipes import from_url, load_import
-from .store import Store
-from .walmart import WalmartMCP, load_cache, reset_session
-
-RUNS = Path(__file__).resolve().parents[2] / "site" / "data"
-
-
-def recipe_buys(store: Store) -> list[Buy]:
-    """Saved recipe ingredients, as shopping lines."""
-    out: list[Buy] = []
-    for recipe in store.recipes():
-        for line in recipe["ingredients"]:
-            out.append(Buy(item=line, buy=line, aisle="", meals=[recipe["title"]],
-                           need=line, approximate=False, spare="",
-                           source="recipe:" + (recipe["title"] or recipe["url"])))
-    return out
+from . import gateway, household, profile
+from .aggregate import parse_amount
+from .cart import build_plan
+from .importer import import_recipe
+from .mealplan.grocery import aggregate
+from .mealplan.planner import plan_week
+from .mealplan.rules import Ruleset
+from .mealplan.shopping import optimize, why_dropped
+from .mealplan.stores import build_store_plan
+from .resolve import NoProduct, Product, Unknown, resolve
+from .walmart import WalmartHTTP
 
 
-def collect(shopping: str, extras: str, limit: int | None,
-            store: Store | None = None) -> list:
-    buys = load_shopping(shopping) + load_extras(extras, on=date.today())
-    if store is not None:
-        buys += recipe_buys(store)
-        buys = dedupe(buys)
-    if store is not None:
-        buys, on_hand = filter_buys(buys, store)
-        if on_hand:
-            print(f"pantry: {len(on_hand)} line(s) already on hand, skipped")
-    return buys[:limit] if limit else buys
+def _values(profile_name: str) -> dict:
+    path = profile.values_path(profile_name)
+    if not path.is_file():
+        return {}
+    try:
+        return json.loads(path.read_text())
+    except ValueError:
+        return {}
 
 
-def run_pantry(shopping: str, extras: str, store: Store) -> int:
-    """Ask once per staple, remember the answer, never ask again."""
-    buys = load_shopping(shopping) + load_extras(extras, on=date.today())
-    catalog = load_catalog()
-    todo = candidates(buys, catalog, store.pantry())
-    if not todo:
-        print("pantry: nothing new to ask about "
-              f"({len(store.pantry())} answers already stored)")
-        return 0
-    print(f"{len(todo)} item(s) this week's plan needs could already be in your "
-          f"kitchen.\nAnswer once and it stops asking. Enter = you need to buy it.\n")
-    answered = 0
-    for buy in todo:
-        key = canonical(buy.item)
-        group = group_for(buy.item, catalog)
-        try:
-            answer = input(f"  [{group}] already have {key}? [y/N] ")
-        except EOFError:
-            print("\n  (no input available; stopping, nothing else was saved)")
-            break
-        store.set_pantry(key, "have" if answer.strip().lower() in ("y", "yes") else "need")
-        answered += 1
-    print(f"\npantry: {answered} answer(s) saved to {store.path.name}. "
-          f"{len(store.pantry())} total.")
-    return 0
+def _qty(amount: str):
+    parsed = parse_amount(amount)
+    return parsed.quantity if parsed.known else None
 
 
-def dump(results: list[MatchResult], summary: dict, path: Path) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps({
-        "summary": summary,
-        "results": [
-            {
-                "action": r.action,
-                "confidence": r.confidence,
-                "item_id": r.item_id,
-                "title": r.title,
-                "price": r.price,
-                "price_text": r.price_text,
-                "reason": r.reason,
-                "query": r.query,
-                "buy": {
-                    "item": r.buy.item,
-                    "buy": r.buy.buy,
-                    "aisle": r.buy.aisle,
-                    "meals": r.buy.meals,
-                    "source": r.buy.source,
-                },
-            }
-            for r in results
-        ],
-    }, indent=2))
+def run(profile_name: str, links: list[str], matcher=None) -> dict:
+    """One week, assembled exactly the way the app assembles it."""
+    values = _values(profile_name)
+    dinners = int((values.get("plan") or {}).get("dinners") or 5)
+
+    recipes, unresolved = [], []
+    for raw in (import_recipe(url) for url in links):
+        if not raw.ingredients:
+            unresolved.append({"line": raw.source,
+                               "reason": raw.note or "no ingredient list"})
+            continue
+        recipes.append({
+            "source": raw.source, "title": raw.title,
+            "creator": raw.creator, "confidence": raw.confidence,
+            "ingredients": [
+                {"item": ing.item, "qty": _qty(ing.amount), "unit": ing.unit}
+                for ing in raw.ingredients],
+        })
+
+    try:
+        paths = profile.paths(profile_name)
+    except profile.UnknownProfile:
+        paths = {}
+    ruleset = (Ruleset.load(paths["rules"]) if "rules" in paths
+               else Ruleset([]))
+    plan = (plan_week(recipes, ruleset, household.preferences(profile_name),
+                      days=dinners)
+            if recipes else
+            {"days": [], "notes": [], "rejected": [], "review": []})
+
+    lines = aggregate(plan["days"])
+    buys, dropped = optimize(plan["days"], lines)
+    for item in dropped:
+        unresolved.append({"line": item, "reason": why_dropped(item)})
+
+    results = asyncio.run(build_plan(buys, matcher or WalmartHTTP()))
+    by_line = {id(r.buy): r for r in results}
+
+    def _lookup(line, retailer, wanted):
+        found = by_line.get(id(line))
+        if found is None:
+            return NoProduct("the line was never searched: it carries no query")
+        if found.action == "add" and found.item_id:
+            return Product(item_id=found.item_id, quantity=1,
+                           title=found.title, price=found.price,
+                           why=found.reason)
+        return NoProduct(found.reason or
+                         "no product at the store matched this line")
+
+    resolved: list = []
+    for line in buys:
+        answer = resolve(line, lookup=_lookup)
+        if isinstance(answer, Unknown):
+            unresolved.append({"line": answer.item, "reason": answer.reason})
+        else:
+            resolved.append(answer)
+
+    stops = build_store_plan(paths["stores"]) if "stores" in paths else []
+    store_id = next((s.store_id for s in stops
+                     if s.key == gateway.WALMART.key and s.store_id), None)
+    cart_link = None
+    if resolved and not unresolved and store_id:
+        rendered = gateway.render_cart_link(
+            [answer.cart_line() for answer in resolved], store_id)
+        cart_link = rendered.partition("\n\n")[0]
+    return {"plan": plan, "shopping": [vars(buy) for buy in buys],
+            "resolved": len(resolved), "unresolved": unresolved,
+            "cart_link": cart_link, "store": store_id}
 
 
-async def run(args) -> int:
-    with Store(args.db) as store:
-        if args.forget_pantry:
-            store.forget_pantry(args.forget_pantry)
-            print(f"pantry: forgot {args.forget_pantry}")
-        if args.recipes:
-            saved = store.recipes()
-            if not saved:
-                print("no saved recipes yet; add one with --add-recipe URL")
-            for recipe in saved:
-                print(f"  {recipe['title'] or '(untitled)'}  "
-                      f"[{len(recipe['ingredients'])} ingredients]  {recipe['url']}")
-            return 0
-        if args.import_recipes:
-            imported = load_import(args.import_recipes)
-            for recipe in imported:
-                store.add_recipe(recipe.url, recipe.title, recipe.source,
-                                 recipe.ingredients, verified=False)
-            print(f"imported {len(imported)} recipe(s)")
-            return 0
-        if args.add_recipe:
-            added = 0
-            for url in args.add_recipe:
-                try:
-                    recipe = from_url(url)
-                except Exception as exc:  # noqa: BLE001 - a bad link must not kill the run
-                    print(f"  could not read {url}: {exc}")
-                    continue
-                if recipe is None or not recipe.ok:
-                    print(f"  no recipe found at {url} "
-                          f"(no schema.org/Recipe block)")
-                    continue
-                store.add_recipe(recipe.url, recipe.title, recipe.source,
-                                 recipe.ingredients)
-                print(f"  saved {recipe.title} ({len(recipe.ingredients)} ingredients)")
-                added += 1
-            print(f"added {added} recipe(s)")
-            return 0
-        if args.pantry:
-            return run_pantry(args.shopping, args.extras, store)
-        return await _run(args, store)
-
-
-async def _run(args, store: Store) -> int:
-    buys = collect(args.shopping, args.extras, args.limit, store)
-    print(f"{len(buys)} lines to consider "
-          f"({sum(1 for b in buys if b.source == 'extras')} of them extras)")
-
-    if args.dry_run:
-        results = [score(b, normalize_query(b.item), []) for b in buys]
-        print(render(results))
-        print(f"\n[dry-run] {len(results)} lines staged. No network, no cart writes.")
-        dump(results, {"would_add": 0, "added": 0, "denied": 0,
-                       "skipped_flagged": len(results)}, RUNS / "dry-run.json")
-        return 0
-
-    if args.replay:
-        cache = load_cache()
-        results = []
-        for buy in buys:
-            query = normalize_query(buy.item)
-            candidates = cache.get(query)
-            if candidates is None:
-                results.append(MatchResult(buy=buy, query=query, action="flag",
-                                           reason="not searched yet"))
-            else:
-                results.append(score(buy, query, candidates))
-        print(render(results))
-        known = [r for r in results if r.item_id is not None]
-        print(f"\n[replay] {len(known)}/{len(results)} lines matched from cache, "
-              f"no network used")
-        dump(results, {"would_add": len(known), "added": 0, "denied": 0,
-                       "skipped_flagged": len(results) - len(known),
-                       "replayed": True},
-             RUNS / "demo-run.json")
-        return 0
-
-    if reset_session():
-        print("cleared a stale session cookie jar")
-
-    async with WalmartMCP(use_cache=not args.no_cache) as wm:
-        print("status:", (await wm.status()).splitlines()[0])
-
-        def progress(index: int, total: int, result: MatchResult) -> None:
-            print(f"  [{index:>2}/{total}] {result.action:4} "
-                  f"{result.confidence:.2f} {normalize_query(result.buy.item)}")
-
-        results = await build_plan(buys, wm, on_progress=progress, pause=args.pause)
-        if wm.hits:
-            print(f"  ({wm.hits} of {len(buys)} answered from cache)")
-        print()
-        print(render(results))
-        flagged = [r for r in results if r.action != "add"]
-        print(f"\n{len(results) - len(flagged)} matched, {len(flagged)} need your call")
-
-        def approve(result: MatchResult) -> bool:
-            if args.yes:
-                return True
-            try:
-                answer = input(f"add {result.title} "
-                               f"({result.price_text or 'price ?'})? [Y/n] ")
-            except EOFError:
-                # Non-interactive run: silence is not consent.
-                return False
-            return answer.strip().lower() in ("", "y", "yes")
-
-        summary = await apply(results, wm, approve)
-        print(json.dumps(summary, indent=2))
-        cart = await wm.view_cart()
-        print("cart:", cart[:500])
-        dump(results, summary, RUNS / "live-run.json")
-        print("\nSTOPPING BEFORE CHECKOUT. Payment is yours to make.")
-    return 0
-
-
-def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="meal-to-cart")
-    root = Path(__file__).resolve().parents[2]
-    parser.add_argument("--db", default=None, help="where to keep pantry and run history")
-    parser.add_argument("--shopping", default=str(root / "data/sample/shopping.sample.json"))
-    parser.add_argument("--extras", default=str(root / "data/extras.json"))
-    parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--pause", type=float, default=25.0,
-                        help="seconds between searches; Walmart blocks on rate")
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--yes", action="store_true",
-                        help="auto-approve matches (still never checks out)")
-    parser.add_argument("--pantry", action="store_true",
-                        help="ask which staples you already have, and remember")
-    parser.add_argument("--add-recipe", metavar="URL", action="append", default=[],
-                        help="save a recipe link and pull its ingredients (repeatable)")
-    parser.add_argument("--import-recipes", metavar="FILE",
-                        help="import recipes the agent extracted from social video")
-    parser.add_argument("--recipes", action="store_true", help="list saved recipes")
-    parser.add_argument("--forget-pantry", metavar="ITEM",
-                        help="forget one pantry answer, so it asks again")
-    parser.add_argument("--replay", action="store_true",
-                        help="rebuild the full plan from cached searches, offline")
-    parser.add_argument("--no-cache", action="store_true",
-                        help="ignore cached searches and hit the network")
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(
+        prog="meal-to-cart",
+        description="Turn recipe links into a week and a reviewed cart link.")
+    parser.add_argument("--profile", default="demo",
+                        help="which profile's values/rules/stores to use")
+    parser.add_argument("--link", action="append", default=[],
+                        help="a recipe link (repeat for more nights)")
+    parser.add_argument("--json", dest="json_path", default="",
+                        help="write the whole run to this file")
     args = parser.parse_args(argv)
-    if not args.dry_run:
-        args.live = True
-    return asyncio.run(run(args))
+    if not args.link:
+        parser.error("at least one --link is required: the week is built "
+                     "from the recipes you bring")
+
+    out = run(args.profile, args.link)
+    print("The week")
+    for day in out["plan"]["days"]:
+        names = ", ".join(recipe.get("title") or recipe.get("source") or "?"
+                          for recipe in day.get("recipes") or [])
+        print(f"  {day['day']:<10} {names or '-- (bring another link)'}")
+    for note in out["plan"]["notes"]:
+        print(f"  note: {note}")
+
+    print("\nThe list")
+    for row in out["shopping"]:
+        nights = ", ".join(row["meals"]) or "--"
+        print(f"  {row['aisle']:<15} {row['item']:<24} "
+              f"buy {row['buy']:<12} ({nights})")
+
+    blocked = [row for row in out["unresolved"] if row["line"] in
+               {r["item"] for r in out["shopping"]}]
+    named = [row for row in out["unresolved"] if row not in blocked]
+    if blocked:
+        print("\nOn the list but not addable (named, not hidden)")
+        for row in blocked:
+            print(f"  {row['line']}: {row['reason']}")
+    if named:
+        print("\nNot on the list (named, not hidden)")
+        for row in named:
+            print(f"  {row['line']}: {row['reason']}")
+
+    print()
+    if out["cart_link"]:
+        print("Cart link (yours to review; nothing is ordered):")
+        print(out["cart_link"])
+    elif out["unresolved"]:
+        print("No link was emitted: a cart with holes in it is worse than "
+              "none.")
+        print("The reasons above are the holes.")
+    elif not out["store"]:
+        print("No link was emitted: this profile names no Walmart store "
+              "id, and the link needs one.")
+    else:
+        print("No link was emitted: there was nothing to add.")
+    if args.json_path:
+        with open(args.json_path, "w") as handle:
+            json.dump(out, handle, indent=2)
+        print(f"\nSaved {args.json_path}")
+    return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())

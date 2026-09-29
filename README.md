@@ -8,61 +8,65 @@ shopping list of about 50 lines. Every one of those lines then gets retyped into
 grocery site by hand. This closes that last gap: plan → list → cart, with a person
 approving each line and paying themselves.
 
+The wizard half lives at [zuwiizu/meal-to-cart-app](https://github.com/zuwiizu/meal-to-cart-app):
+a brand-new user pastes recipe links, answers one card about their week, and gets back
+their own plan, their own list and their own cart link. It imports this package and pins
+its runtime API in its own test suite; the two repos move together.
+
 ---
 
 ## Quickstart (no credentials needed)
 
 ```bash
-git clone <this repo> && cd meal-to-cart
-python3 -m venv .venv && ./.venv/bin/pip install -e ".[dev]"
-./.venv/bin/meal-to-cart --dry-run
+git clone https://github.com/zuwiizu/meal-to-cart && cd meal-to-cart
+uv run --extra dev pytest -q                      # the suite, offline
+
+# one link -> one dinner -> the whole pipeline, live search included:
+uv run meal-to-cart --link "https://www.skinnytaste.com/air-fryer-chicken-thighs/"
+
+# the exact run the wizard drives (app repo cloned next to this one):
+MTC_ROOT=../meal-to-cart-app uv run meal-to-cart --profile demo \
+  --link "https://www.skinnytaste.com/air-fryer-chicken-thighs/"
 ```
 
-That prints the whole pipeline — load, filter, normalise, match, propose — with no
-network, no login and no browser. Sample data ships in `data/sample/`.
-
-To go live you need the Walmart MCP server and one browser download:
-
-```bash
-./scripts/setup_mcp.sh          # installs the server, the browser, and two patches
-./.venv/bin/meal-to-cart --limit 5 --yes
-```
-
-`--yes` auto-approves matches so the run is non-interactive. It still cannot pay.
+The run prints the week, every line with its aisle and amount, every refusal **by name
+and reason**, and a cart link only when nothing is left unnamed. There is no checkout;
+payment is yours.
 
 ---
 
 ## Architecture
 
 ```
-  weekly plan  ──►  shopping.json  ──┐
-  (existing pipeline, unchanged)     │
-                                     ├──►  normalize  ──►  match  ──►  APPROVE  ──►  cart
-  extras.json (breakfast, lunch,     │      prose →       search →     a human      (stop)
-  snacks, fruit, drinks)  ───────────┘      a product      a SKU       decides
+  recipe links ─► importer ─► mealplan (rules → week → list → buys) ─┐
+                                                                     ├─► resolve
+  profile: values, rules, stores ────────────────────────────────────┘   (product | named refusal)
+                                                                          │
+                                   cart link ◄─ gateway ◄─ match ◄─ walmart (1 GET)
 ```
 
 | Piece | What it does |
 | --- | --- |
-| `mealplan` (external) | The existing planner. Gained one flag, `--shopping-json`, and nothing else. |
-| `normalize.py` | Recipe prose into something a store search bar accepts. Pure functions. |
-| `match.py` | Scores search candidates, and refuses to guess below 0.70 confidence. Pure functions. |
-| `cart.py` | `build_plan` only searches. `apply` is the only writer, and it writes only what a human approved. |
-| `walmart.py` | The single MCP boundary. Owns the session and every response-shape assumption. |
-| `pantry.py` | Asks which staples you already own, and remembers, so it asks once and not weekly. |
-| `store.py` | SQLite. Pantry answers, saved recipe links, and every run's outcome. |
-| `counsel.py` | Optional local advisors (Laya for verdicts, Jev for ranking). No-ops when unconfigured. |
+| `importer.py` | A recipe link → ingredient lines. The page's own JSON-LD first, plain text second, a named note when neither. Never invents an amount. |
+| `mealplan/rules.py` | The profile's own rules: reject bars, review flags, phrased exceptions ("peanut" is not "peanut butter"). |
+| `mealplan/planner.py` | Recipes → a week. One recipe at most once per week; a dashed expectation becomes a note, never a silent repeat. |
+| `mealplan/grocery.py` | The week → one line per purchase; amounts add up only when both were stated. |
+| `mealplan/shopping.py` | Lines → buys. Drops what no cart could hold (equipment, water, sentences) and names every drop. |
+| `walmart.py` | The store's search page **as published**: one GET, one embedded JSON blob. Raises rather than guessing from markup. |
+| `match.py` | Scores tiles. Below 0.70 the line is refused with the reason. Pure functions. |
+| `cart.py` | Searches; every answer is stamped onto its own line. |
+| `resolve.py` | **The seam**: a line becomes a product or a named refusal. Never searches on its own. |
+| `gateway.py` | The cart link. Refuses an empty cart and a missing store; there is still no code path that pays. |
 | `guard.py` | Fails the build if a private term reaches a published file. |
 
-Two boundaries are deliberately narrow. `walmart.py` is the only module that touches the
-network, so a change in the third-party server breaks one file. `normalize.py` and
-`match.py` are pure, so the interesting logic is testable without a browser or a login.
+`normalize.py` and `match.py` are pure, so the interesting logic runs without a network.
+`walmart.py` is the only module that talks to the store, so a change there breaks one file.
 
 ---
 
-## What broke
+## The first build — what broke (kept as the record)
 
-This is the honest part, and it is most of the build.
+This is the honest part, and it is most of the first build.
 
 **1. There is no public Walmart cart API.** The official APIs are partner-gated, so the
 cart path is browser automation through a third-party MCP server. That decision is what
@@ -89,10 +93,6 @@ tear the browser down, clear the jar, start over — **does not work**, and meas
 what showed why: every fresh session presents the same visitor id. It is a request *rate*,
 not a session. Two searches go through and then the wall comes down, every time.
 
-The answer is to not ask twice: every search is cached, so a weekly re-run over the same
-forty products costs no requests at all, and a cold run paces itself at 25 seconds a
-query. `meal-to-cart --replay` rebuilds the entire plan from cache with no network.
-
 **4. Prose is not a product.** The real list contains `juice of 2 large limes )`,
 `to 1/2 cup onions`, `(15oz tomato sauce)`, `1% buttermilk`, `teaspoon cinnamon` *and*
 `teaspoon cinnamon, ground`. Naive matching adds the wrong thing or nothing at all.
@@ -109,108 +109,60 @@ Full evidence, including the commands and their output, is in `BUILD_LOG.public.
 
 ---
 
-## The cupboard problem
+## The rebuild (current code)
 
-The planner already prints a cupboard check, then ignores it: the shopping list still
-contains all fifteen seasonings. So they get bought every week, or deleted by hand every
-week.
+The first build drove a real browser through an MCP server and paid for it in CAPTCHAs
+and cookie fingerprints (above). The rebuild reads the store's **search page the way the
+page was built to be read**: it is a Next.js app, and its results ship as an embedded
+`__NEXT_DATA__` JSON blob. One GET per query. No browser, no session, no login, no
+stealth — the version string that decided everything above is simply gone.
 
-`meal-to-cart --pantry` asks about only the staples *this week's plan actually needs* —
-eight questions for the sample week, not a hundred and twenty — and stores the answers.
+Two failures were found live during the rebuild, and both are real:
 
-```
-$ meal-to-cart --pantry
-8 item(s) this week's plan needs could already be in your kitchen.
-Answer once and it stops asking. Enter = you need to buy it.
+- **A comma hid the phrase.** `" garlic powder "` failed inside `Garlic Powder, 3.4 oz`,
+  so a perfect product scored 0.26 and was refused. Fixed with word-run matching; the
+  same fix stops `case` firing inside "Casero" and lets `lemons` meet `lemon`.
+- **The ads pushed food off the shelf.** `lemon` was refused because the first five
+  tiles were an enhancer, lemonades and juice packets — and tile six was
+  `Fresh Lemons, 2 lb Bag` at 0.85. The shelf is now ten wide.
 
-  [Keeps well in the cupboard] already have garlic? [y/N] y
-  [Keeps well in the cupboard] already have onion? [y/N] y
-  [Dry goods] already have tomato sauce? [y/N]
-  ...
+What is still refused, on purpose: the real recipe asks for "dried herbs (such as herbes
+de provence or dried oregano)". The store sells no product called "herbs", and every
+candidate is a specific herb the recipe did not name. The pipeline refuses **by name**
+rather than guessing. A named hole beats a wrong item in a cart.
 
-pantry: 8 answer(s) saved to state.db. 8 total.
+The full account with commands and output is `BUILD_LOG.public.md` §6, and the wizard
+end-to-end is the app repo's `SETUP.md` and `VIDEO.md`.
 
-$ meal-to-cart --pantry
-pantry: nothing new to ask about (8 answers already stored)
-```
-
-The second run is silent, and afterwards the shopping list simply omits them. Answering
-"yes" to `onion` removes every line that means onion, because `small onion`,
-`to 1/2 cup onions` and `onions` are one bulb in one drawer — that is what
-`canonical()` in `normalize.py` exists for.
-
-State lives in one gitignored SQLite file: pantry answers, saved recipe links, and what
-each week's run proposed and what you approved.
+---
 
 ## Recipes from links
 
-`--add-recipe URL` saves a link and pulls its ingredient list. Most recipe sites already
-publish the recipe in machine-readable form — a `schema.org/Recipe` block in a JSON-LD
-script tag — so the default path is a JSON parse. No model, no API key, no HTML guessing.
+Most recipe sites already publish the recipe in machine-readable form — a
+`schema.org/Recipe` block in a JSON-LD script tag — so the default import is a JSON
+parse. No model, no API key, no HTML guessing. Measured live: a Skinnytaste page returns
+title, creator, 8 ingredients and confidence 0.95 in about a second. When a site blocks
+non-browser fetches, the import says so by name instead of guessing.
 
-```
-$ meal-to-cart --add-recipe https://www.seriouseats.com/classic-panzanella-salad-recipe
-  saved Classic Panzanella Salad (Tuscan-Style Tomato and Bread Salad) (10 ingredients)
-added 1 recipe(s)
-```
-
-Those ingredients then join the shopping list, deduped against everything else. Sites that
-block non-browser fetches (`cookieandkate.com` answers 403) are reported as a skip rather
-than a crash.
-
-Social video has no such block. That path is yt-dlp for the caption, then a model —
-heavier, and it needs a key. Rather than hide that behind a flag, the agent extracts those
-and imports them through `--import-recipes`, which accepts the same shape this module
-produces. One code path, two ways in.
-
-## Laya and Jev
-
-Both are optional local advisors, reached over the same MCP transport `walmart.py`
-already uses. `counsel.py` has a null implementation, so with nothing configured the app
-runs on its built-in scorer and every call site stays free of "is it configured" branches.
-
-They do **not** speed up the cart path. That path is limited by Walmart's request rate,
-not by thinking, so no amount of local inference changes it. What they remove is the API
-key, and that is the thing that actually blocks an average user.
-
-They are worth wiring for quality. Measured on this project's worst case:
-
-```
-jev_rank("fresh dill herb, a bunch, for garnish")
-  Fresh Dill, 0.75 oz Clamshell                     3.74
-  Dill Pickle Flavored Potato Chips                 0.70
-  OH SNAP! Dilly Bites Dill Pickle Snack Pack       0.69
-
-laya_decide("tool_risk", {action: "add_to_cart", credentials_involved: true})
-  verdict "ask_human" (p=0.841)
-```
-
-Token overlap gave the snack pack 1.00 — the highest score the system can give. Jev put
-it last, in 438ms, for $0.000025. And Laya independently arrives at "ask a human" for a
-live cart write, which is the stance the whole design is built around.
-
-Wire them with:
-
-```bash
-MEAL_TO_CART_COUNSEL_CMD="npx -y your-advisor-mcp" meal-to-cart --live
-```
+---
 
 ## Safety
 
-- The agent **never calls checkout**. There is no code path that pays.
-- Below 0.70 confidence an item is **flagged, never added** — a wrong item costs more
-  than a question.
-- A non-interactive run declines anything it cannot ask about (`EOFError` is not consent).
-- Credentials and address live only in a gitignored `.env`.
+- The run **never calls checkout**. There is no code path that pays, and the cart link
+  opens for review in your own browser.
+- Below 0.70 confidence an item is **refused by name**, never added — a wrong item costs
+  more than a question.
+- A cart link is rendered only when **nothing** is left unnamed.
 - `python -m meal_to_cart.guard` must pass before publishing.
 
 ## Layout
 
 ```
-src/meal_to_cart/   normalize, match, cart, pantry, store, counsel, walmart, guard, server
-data/               extras.json, rules.public.json, sample/
-site/               the static demo page (demo mode always works; live mode via tunnel)
-scripts/            setup_mcp.sh, patch_mcp.py, probe_mcp.py
-prompts/            the prompts that produced this, in order
-docs/plans/         the implementation plan
+src/meal_to_cart/   importer, profile, household, resolve, gateway, aggregate, cli,
+                    mealplan/ (rules, planner, grocery, shopping, stores),
+                    walmart, match, cart, normalize, guard
+tests/              the suite, with a committed recipe fixture
+data/               sample/, rules.public.json, extras.json
+prompts/            the prompts that produced the first build, in order
+scripts/, vendor/, site/    the first build's setup, vendored server and demo page
 ```
