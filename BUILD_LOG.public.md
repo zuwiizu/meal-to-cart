@@ -472,11 +472,21 @@ five tiles were an enhancer, lemonades and juice packets. Tile six was
 `Fresh Lemons, 2 lb Bag` at 0.85. The shelf was widened to ten and the lemon resolves.
 The first five results at this store are, quite literally, the ads.
 
-**What is still refused, on purpose.** The real recipe says "1/2 teaspoon dried herbs
-(such as herbes de provence or dried oregano)". The store sells no product called
-"herbs", and every candidate within ten tiles is a specific herb the recipe did not name
-(oregano, thyme, parsley...). The pipeline refuses the line and says why. A named hole
-beats a wrong item in a cart; the refusal is the product working.
+**The recipe named its own stand-ins; the first build ignored them.** The real recipe
+says "1/2 teaspoon dried herbs (such as herbes de provence or dried oregano)". The
+first build stripped the parentheses and asked the store for `herbs` — a category, and
+no shelf holds one; the best candidate scored 0.60 inside ten tiles and the line was
+refused. But this recipe had *named its stand-ins*. The fix reads them: when a bare
+category head carries a "(such as X or Y)" list, the first stand-in becomes the
+purchase — the store answers `herbs de provence` with "Great Value Organic Herbs De
+Provence, 0.6 oz" at 0.85. Nothing is invented: the words are the recipe's own. A line
+that names no stand-in is still refused by name — a named hole beats a wrong item in a
+cart.
+
+**The store throttles.** A burst of searches earns an honest `429 Too Many Requests`.
+The search now retries once after a short wait on exactly the store's "try later"
+answers (429/503), then names the failure if it stands — a refusal for a real reason,
+never a silent hole.
 
 ### 6.2 Evidence (live, 2026-09-29)
 
@@ -485,7 +495,9 @@ beats a wrong item in a cart; the refusal is the product working.
 - The committed fixture run matches 8 of 8 lines; pointed at the app repo's profile
   (`MTC_ROOT=../meal-to-cart-app`) it renders a cart link with real usItemIds —
   `44391659` = "Fresh Lemons, 2 lb Bag", `676979470` = "Great Value Garlic Powder".
-- The same real link run end-to-end through the wizard's agent: 200 OK, 7 of 8 lines
-  matched, the eighth is the "herbs" refusal above.
+- The same real link run end-to-end through the wizard's agent: 200 OK; the pre-fix
+  run matched 7 of 8 lines, the eighth the "herbs" refusal now fixed above.
+- The stand-ins fix, live: `herbs de provence` resolves to "Great Value Organic Herbs
+  De Provence, 0.6 oz" at 0.85; engine suite 85 passed / 1 skipped after the fix.
 - Tests: engine green (1 skip: per-machine terms file), wizard app green (2 skips, same
   reason). `python -m meal_to_cart.guard` passes on both trees.

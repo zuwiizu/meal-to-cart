@@ -9,8 +9,28 @@ hole.
 """
 from __future__ import annotations
 
+import asyncio
+
 from .match import MatchResult, score
 from .normalize import normalize_query
+
+# The store's throttle answers 429; one short, bounded retry is the
+# difference between a cart and a refused line on a busy connection. The
+# wait is a module constant so a test can hold the network still and take
+# it to zero.
+_RETRY_WAIT = 2.5
+_RETRYABLE = (429, 503)
+
+
+async def _search(http, query: str):
+    try:
+        return await http.search(query, limit=10)
+    except Exception as exc:               # only the store's own "try later"
+        code = getattr(exc, "code", None)
+        if code not in _RETRYABLE:
+            raise
+        await asyncio.sleep(_RETRY_WAIT)
+        return await http.search(query, limit=10)
 
 
 async def build_plan(lines: list, http) -> list[MatchResult]:
@@ -22,7 +42,7 @@ async def build_plan(lines: list, http) -> list[MatchResult]:
             # Ten, not five: the store's opening tiles are its ad block, and
             # the real thing sits under it. Found live -- a five-tile shelf
             # flagged "lemon" while tile six was exactly the thing.
-            rows = await http.search(query, limit=10)
+            rows = await _search(http, query)
         except Exception as exc:          # the search is the one flaky edge
             results.append(MatchResult(
                 buy=line, query=query, action="flag",

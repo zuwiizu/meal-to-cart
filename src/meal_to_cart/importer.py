@@ -78,6 +78,19 @@ _LEADING = {
     "quartered", "peeled", "trimmed", "thawed", "chilled", "cold",
 }
 _PARENS = re.compile(r"\(.*?\)")
+# 'dried herbs (such as herbs de provence or dried oregano)': the recipe
+# NAMES its own stand-ins. A bare category head ('herbs') is not a
+# product; when the recipe writes 'such as', its first named stand-in is
+# what it says to buy, and the store search gets that name instead.
+_SUCH_AS = re.compile(r"\(\s*such as\s+([^)]+)\)", re.I)
+
+
+def _first_standin(text: str) -> str:
+    match = _SUCH_AS.search(str(text or ""))
+    if not match:
+        return ""
+    first = re.split(r"\s+or\s+|,|;", match.group(1), maxsplit=1)[0]
+    return re.sub(r"^[\s(]+", "", first).strip(" ).,-")
 
 
 @dataclass
@@ -135,6 +148,7 @@ def _unit_or_none(word: str) -> str | None:
 
 
 def _clean_item(text: str) -> str:
+    standin = _first_standin(text)
     text = _PARENS.sub(" ", str(text or ""))
     text = text.split(",")[0]                      # "with bone and skin", "to taste"
     text = re.sub(r"^(?:freshly|fresh)\s+ground\s+", "", text, flags=re.I)
@@ -143,7 +157,13 @@ def _clean_item(text: str) -> str:
         words.pop(0)
     text = " ".join(words)
     text = re.sub(r"^of\s+", "", text, flags=re.I)
-    return re.sub(r"\s+", " ", text).strip(" ,.-")
+    text = re.sub(r"\s+", " ", text).strip(" ,.-")
+    # A one-word head is a category ('herbs'), not a product. When the
+    # recipe named a stand-in, that stand-in is the purchase; multi-word
+    # heads are already names and are left alone.
+    if standin and len(text.split()) == 1:
+        return standin
+    return text
 
 
 def parse_ingredient(line: str) -> Ingredient | None:

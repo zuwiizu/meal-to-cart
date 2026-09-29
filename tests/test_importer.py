@@ -104,3 +104,19 @@ def test_the_committed_fixture_reads_whole():
     assert all(ingredient.amount for ingredient in recipe.ingredients)
     assert _by_item(recipe)["parsley"].unit == "tablespoon"
     assert _by_item(recipe)["chicken thighs"].amount == "6"
+
+
+def test_a_named_standin_replaces_a_bare_category_head():
+    """'dried herbs (such as herbs de provence or dried oregano)': the recipe
+    named its own stand-ins, and a bare category head is not a product, so
+    the first stand-in is what the store is asked for. A multi-word head is
+    already a name and is left alone."""
+    recipe = parse_page(
+        "Title: Stand-in\n\n## Ingredients\n"
+        "* 0.5 teaspoon dried herbs (such as herbs de provence or dried oregano)\n"
+        "* 2 pounds chicken thighs (such as boneless or bone-in)\n",
+        "https://example.com/standin")
+    by_item = _by_item(recipe)
+    assert by_item["herbs de provence"].amount == "0.5"
+    assert by_item["herbs de provence"].unit == "teaspoon"
+    assert "chicken thighs" in by_item

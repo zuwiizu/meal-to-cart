@@ -31,8 +31,8 @@ Open `http://127.0.0.1:8000/`, expand **Agent — where your links are sent**, s
 | 2:00–3:00 | The card: week shape, servings, budget, allergies | "The budget is a target, never a block. Allergies get named in the reasons panel, never removed quietly." |
 | 3:00–5:00 | **Build my week** (real run) | Narrate: the week, the list by aisle, and any refusal — read its reason out loud. |
 | 5:00–6:00 | The cart link → the real cart page | "It stops here. There is no code path that pays; payment is a human act." |
-| 6:00–7:30 | `BUILD_LOG.public.md` §6: the comma bug and the ad shelf | "Two things broke live during the rebuild. Here is exactly what changed and why the fix was principled rather than tuned to make the demo look good." |
-| 7:30–8:30 | §6: the "herbs" refusal | "The recipe asks for herbs; the store sells no product called 'herbs'. Rather than pick oregano, it refuses by name. That is the product working." |
+| 6:00–7:30 | `BUILD_LOG.public.md` §6.1: the comma bug, the ad shelf, the ignored stand-ins | "Three things broke live during the rebuild. Here is exactly what changed and why the fix was principled rather than tuned to make the demo look good." |
+| 7:30–8:30 | §6.1: the "herbs" stand-ins | "The store sells no product called 'herbs'. The recipe itself said 'such as herbs de provence' — so the fix uses the recipe's own stand-in. When a recipe names nothing, it still refuses by name: a named hole beats a wrong item in a cart." |
 | 8:30–9:30 | §3 of the log | "The first build fought a bot wall for the largest block of the project. The rebuild removed the fight: one GET of the page's own data, no browser." |
 
 ## Two things not to do

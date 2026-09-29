@@ -128,3 +128,25 @@ class TestBuildPlan:
         assert results[0].action == "flag"
         assert "failed" in results[0].reason
         assert "boom" in results[0].reason
+
+    def test_a_throttled_search_is_retried_once(self):
+        class Throttled(Exception):
+            code = 429
+
+        class BusyShelf(_FakeHTTP):
+            def __init__(self, rows):
+                super().__init__(rows)
+                self.calls = 0
+
+            async def search(self, query, limit=5):
+                self.calls += 1
+                if self.calls == 1:
+                    raise Throttled("HTTP Error 429: Too Many Requests")
+                return await super().search(query, limit=limit)
+
+        cart._RETRY_WAIT = 0.01
+        lines = [Buy(item="olive oil", buy="1")]
+        http = BusyShelf({"olive oil": [_row("Olive Oil Demo")]})
+        results = asyncio.run(cart.build_plan(lines, http))
+        assert http.calls == 2
+        assert results[0].action == "add"
