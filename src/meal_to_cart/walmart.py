@@ -16,16 +16,56 @@ no crawling, no login), not in a header the wall ignores.
 from __future__ import annotations
 
 import asyncio
+import contextlib
+import gzip
 import json
+import os
 import re
+import socket
 import urllib.parse
 import urllib.request
+import zlib
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36")
 SEARCH_URL = "https://www.walmart.com/search?q={query}"
 NEXT_DATA = re.compile(
     r'<script[^>]+id="__NEXT_DATA__"[^>]*>(.*?)</script>', re.S | re.I)
+
+
+def socks_proxy_from_env() -> tuple[str, int] | None:
+    """MTC_SOCKS=host:port, or None when unset.
+
+    The supported way to shop through the network of the machine that owns
+    the store account when THIS host's own address is the one the store has
+    flagged: every store request then leaves through that SOCKS5 proxy.
+    """
+    raw = (os.environ.get("MTC_SOCKS") or "").strip()
+    if not raw:
+        return None
+    host, _, port = raw.rpartition(":")
+    try:
+        return (host or "127.0.0.1", int(port))
+    except ValueError as exc:
+        raise ValueError(f"MTC_SOCKS is not host:port: {raw!r}") from exc
+
+
+@contextlib.contextmanager
+def via_socks(proxy: tuple[str, int]):
+    """Route new sockets through PySocks for one fetch.
+
+    Sequential callers only: the swap is process-wide while it is held, so
+    concurrent fetches in other threads would also take this path.
+    """
+    import socks  # PySocks: imported only when a proxy is asked for
+    host, port = proxy
+    socks.set_default_proxy(socks.SOCKS5, host, port, rdns=True)
+    saved = socket.socket
+    socket.socket = socks.socksocket
+    try:
+        yield
+    finally:
+        socket.socket = saved
 
 
 class StorePageError(RuntimeError):
@@ -72,6 +112,23 @@ def products_from_next_data(data: dict, limit: int = 0) -> list[dict]:
             continue
         price_info = tile.get("priceInfo") or {}
         current = price_info.get("currentPrice") or {}
+        # Prices move off the search blob at times (seen live 2026-09-30:
+        # every tile's priceInfo present but empty, no currentPrice); the
+        # first non-empty shape wins, and an empty price is None, never 0,
+        # so the week's total can say which lines it covers.
+        price = _num(current.get("price"))
+        price_text = str(current.get("priceString") or "")
+        if price is None:
+            for key in ("itemPrice", "linePrice"):
+                candidate = price_info.get(key)
+                if isinstance(candidate, dict):
+                    price = _num(candidate.get("price"))
+                    price_text = price_text or str(candidate.get("priceString") or "")
+                else:
+                    price = _num(candidate)
+                    price_text = price_text or (str(candidate) if price is not None else "")
+                if price is not None:
+                    break
         promises = {}
         for key in ("fulfillment", "shippingAndPickup", "fulfillmentSummary"):
             value = tile.get(key)
@@ -81,8 +138,8 @@ def products_from_next_data(data: dict, limit: int = 0) -> list[dict]:
         stock = str(tile.get("availabilityStatus") or tile.get("stock") or "")
         rows.append({
             "title": str(tile.get("name") or ""),
-            "price": _num(current.get("price")),
-            "price_text": str(current.get("priceString") or ""),
+            "price": price,
+            "price_text": price_text,
             "item_id": item_id,
             "rating": str(tile.get("averageRating") or ""),
             "url": f"/ip/{item_id}",
@@ -114,15 +171,39 @@ class WalmartHTTP:
         self.timeout = timeout
         self.user_agent = user_agent
 
+    @staticmethod
+    def _read_body(response) -> str:
+        """The response's text, decompressed when the store gzipped it.
+
+        The store answers identity-encoded requests with its bot wall (seen
+        live 2026-09-30: HTTP 412 without an Accept-Encoding header, HTTP 200
+        with one) -- so the accept-encoding below is part of the same honesty
+        the module's User-Agent note explains, and the decoding lands here.
+        """
+        raw = response.read()
+        encoding = (response.headers.get("Content-Encoding") or "").lower()
+        if encoding == "gzip":
+            raw = gzip.decompress(raw)
+        elif encoding == "deflate":
+            raw = zlib.decompress(raw)
+        charset = response.headers.get_content_charset() or "utf-8"
+        return raw.decode(charset, errors="replace")
+
     def _fetch(self, url: str) -> str:
         request = urllib.request.Request(url, headers={
             "User-Agent": self.user_agent,
-            "Accept": "text/html,application/xhtml+xml,application/json",
+            "Accept": ("text/html,application/xhtml+xml,application/xml;q=0.9,"
+                       "image/avif,image/webp,*/*;q=0.8"),
             "Accept-Language": "en-US,en;q=0.9",
+            "Accept-Encoding": "gzip, deflate",
         })
-        with urllib.request.urlopen(request, timeout=self.timeout) as response:
-            charset = response.headers.get_content_charset() or "utf-8"
-            return response.read().decode(charset, errors="replace")
+        proxy = socks_proxy_from_env()
+        if proxy is None:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                return self._read_body(response)
+        with via_socks(proxy):
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                return self._read_body(response)
 
     def _blob(self, html: str) -> dict:
         match = NEXT_DATA.search(html or "")

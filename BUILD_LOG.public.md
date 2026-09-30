@@ -501,3 +501,50 @@ never a silent hole.
   De Provence, 0.6 oz" at 0.85; engine suite 85 passed / 1 skipped after the fix.
 - Tests: engine green (1 skip: per-machine terms file), wizard app green (2 skips, same
   reason). `python -m meal_to_cart.guard` passes on both trees.
+
+**The cart really fills.** The emitted link was opened for real in a headed Chrome on a
+residential connection (fresh profile, no account). The addToCart URL ran with no
+challenge, Walmart answered, and the cart reads **7 items, $32.31** — the recipe's
+garlic powder, lemons, chicken thighs, onion powder, herbs de provence, sweet paprika
+and black pepper, matched back against the live cart's own product records. The eighth
+line, kosher salt, was refused by Walmart itself at add time — "out of stock, please
+check back later" — named, not hidden: search-time availability is not add-time
+availability, and the cart says so out loud. (From datacenter networks and headless
+browsers the same URL meets Walmart's bot challenge first; from a normal browser it
+does not.)
+
+### 6.3 The store changes under you (live, 2026-09-30)
+
+Three live failures, found by re-running the whole flow instead of trusting yesterday's
+green. Each one was real, and none of them was in the matching logic.
+
+**The price block moved, then emptied.** Overnight the store's search blob stopped
+carrying per-tile prices at all — 0 of 109 tiles in a saved page had a price (`priceInfo`
+present but empty) — and the field itself had moved from `currentPrice` to `itemPrice`.
+Two bugs surfaced at once: the parser was reading the old field, and the wizard was
+summing an empty priced set as `$0.00` — a free week. Fixed twice over: the parser reads
+`currentPrice`, `itemPrice` or `linePrice` and returns nothing rather than zero, and the
+wizard refuses to render a total over zero priced lines; it says out loud that prices
+did not come back rather than guessing one. A total is a claim; a page that cannot make
+it should not.
+
+**The wall is not a header problem.** The same request shape that earned HTTP 412 from a
+datacenter network came back as an intermittent 307 to `/blocked`: a velocity wall,
+measured live at 4 walls in 5 attempts at 15s spacing and 3 passes in 3 at 25s. The fix
+is honest pacing plus retries: `MTC_SEARCH_GAP` spaces searches, and a walled search is
+retried up to 4 times before it is named as a refusal. During the recorded demo the
+server's window locked hard, so the demo's store reads ran through the operator's own
+browser on their own network — the machine that owns the store session, which is where
+the product says the agent belongs anyway. (The shipped engine keeps its plain HTTP
+client; the browser ride-along is two clearly-labelled demo files, not a product path.)
+
+**The page gave up before the agent did.** The wizard's build timeout was 3 minutes; a
+paced build takes longer than that by design. The page now waits 10 minutes and keeps
+the working state visible, because a paced store means a slow build, not a failed one.
+
+**The final take, end to end (2026-09-30):** real creator link imported; build paced at
+5s through the store; `Built: 1 dinner, 8 list lines, nothing unresolved, a cart link.`
+The emitted link opened in the operator's own browser; the cart reads **Cart (8 items),
+$34.59** — all eight recipe lines, kosher salt included this time. Engine 93 passed / 1
+skipped, wizard 33 passed / 2 skipped, both guards clean. The 55-second recording is app
+page → filled cart, no narration — the voice belongs to the person demoing.
