@@ -111,6 +111,19 @@ class ImportedRecipe:
     confidence: float = 0.0
     note: str = ""
     ingredients: list[Ingredient] = field(default_factory=list)
+    servings: float | None = None
+
+
+def _recipe_servings(value) -> float | None:
+    """Read stated servings only; a loaf or a batch is not a person count."""
+    if isinstance(value, list):
+        value = next((v for v in value if "serv" in str(v).lower()), value[0] if value else "")
+    text = str(value or "").strip().lower()
+    match = re.fullmatch(r"(\d+(?:\.\d+)?)\s*(?:servings?|people|persons?)?", text)
+    if not match:
+        return None
+    count = float(match.group(1))
+    return count if 0 < count <= 100 else None
 
 
 def _num_text(value: float) -> str:
@@ -339,6 +352,7 @@ def parse_page(text: str, url: str = "") -> ImportedRecipe:
         return ImportedRecipe(
             source=url, title=title,
             creator=_author(candidate) or _creator_from(url),
+            servings=_recipe_servings(candidate.get("recipeYield")),
             confidence=_ladder(title, len(lines), structured=True),
             ingredients=[p for p in (parse_ingredient(l) for l in lines) if p])
     title = _title_from(text)
